@@ -31,6 +31,17 @@
       <button class="mode-btn" data-mode="camera">📷 实时摄像头</button>
     </section>
 
+    <p class="subtitle">混合骰型建议使用七类专用 YOLO 权重；CV 模式仅给出候选框，骰型显示 unknown。
+      D4 采用顶角重复数字一致性识别（底边布局不适用）；D100 按百分位骰（00～90）读取，未自动组合个位骰。</p>
+    <label>画面内骰型（混合骰请选自动）
+      <select id="diceType">
+        <option value="unknown">自动 / 未知</option>
+        <option value="d4">D4 顶角</option><option value="d6">D6</option>
+        <option value="d8">D8</option><option value="d10">D10</option>
+        <option value="d12">D12</option><option value="d20">D20</option>
+        <option value="d100">D100 百分位</option>
+      </select>
+    </label>
     <section class="workbench">
       <!-- 上传模式 -->
       <div class="pane upload-pane" id="uploadPane">
@@ -47,6 +58,10 @@
         <div class="actions">
           <button id="btnRun" class="btn-primary" disabled>开始推理</button>
           <button id="btnClear" class="btn-ghost">清除</button>
+          <label class="cam-fps-label" title="上传走百炼 qwen-vl-ocr(更准,但更慢且消耗配额)">
+            <input type="checkbox" id="upUseApi" />
+            走百炼 API
+          </label>
           <span class="status" id="statusText"></span>
         </div>
       </div>
@@ -54,14 +69,18 @@
       <!-- 摄像头模式 -->
       <div class="pane camera-pane hidden" id="cameraPane">
         <div class="cam-hint" id="camHint">
-          📱 手机/其他设备访问：<code id="lanUrl">--</code>（首次需在浏览器点「高级 → 继续前往」接受自签名证书）
+          <div>📱 手机/其他设备访问：<code id="lanUrl">--</code>（首次需在浏览器点「高级 → 继续前往」接受自签名证书）</div>
+          <div class="cam-hint-sub">🔍 检测跟随：骰子滚动时只实时拉框；<b>稳定后自动读点数</b>（黄=移动，绿=稳定读出）。</div>
         </div>
         <div class="cam-stage">
           <video id="camVideo" autoplay playsinline muted></video>
           <canvas id="camOverlay"></canvas>
           <div class="cam-hud">
             <div class="cam-total">总点数: <span id="camTotal">0</span></div>
-            <div class="cam-meta"><span id="camFps">--</span> FPS · <span id="camMs">--</span> ms</div>
+            <div class="cam-hud-right">
+              <span class="cam-state" id="camState">等待</span>
+              <span class="cam-meta"><span id="camFps">--</span> FPS · 检测 <span id="camMs">--</span> ms</span>
+            </div>
           </div>
           <div class="cam-error hidden" id="camError"></div>
         </div>
@@ -69,17 +88,17 @@
           <button id="btnCamStart" class="btn-primary">▶ 开始识别</button>
           <button id="btnCamStop" class="btn-ghost" disabled>■ 停止</button>
           <label class="cam-fps-label">
-            帧间隔
+            目标帧率
             <select id="camInterval">
-              <option value="80">~12 FPS</option>
+              <option value="200">~5 FPS（省流量）</option>
               <option value="125" selected>~8 FPS</option>
-              <option value="200">~5 FPS</option>
-              <option value="333">~3 FPS</option>
+              <option value="80">~12 FPS</option>
+              <option value="50">~20 FPS（最快）</option>
             </select>
           </label>
-          <label class="cam-fps-label">
+          <label class="cam-fps-label" title="稳定后的点数识别改走百炼 qwen-vl-ocr，更准更慢（不阻塞拉框）">
             <input type="checkbox" id="camUseApi" />
-            走百炼（更准更慢）
+            稳定后用百炼
           </label>
         </div>
       </div>
@@ -102,7 +121,7 @@
       <span class="sep">·</span>
       <span>doclayout: <code id="msDoc">未加载</code></span>
       <span class="sep">·</span>
-      <span>dice: <code id="msDice">未加载</code></span>
+      <span>骰子引擎: <code id="diceBackend">检测中</code></span>
     </section>
   </main>
 

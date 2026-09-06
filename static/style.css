@@ -389,6 +389,72 @@ main {
   z-index: 2;
 }
 
+.cam-hud-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+}
+
+.cam-state {
+  background: rgba(0,0,0,0.65);
+  color: var(--warn);
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  border: 1px solid var(--warn);
+}
+
+.cam-state.stable {
+  color: var(--accent);
+  border-color: var(--accent);
+}
+
+.cam-state.waiting {
+  color: var(--muted);
+  border-color: var(--border);
+}
+
+.cam-state.working {
+  color: var(--warn);
+  border-color: var(--warn);
+  animation: pulse 1s infinite;
+}
+
+.cam-hint-sub {
+  margin-top: 4px;
+  font-size: 11px;
+  color: var(--muted);
+}
+
+/* 拉框状态配色:黄=移动/待稳定, 橙=正在稳定, 绿=已读出 */
+.die-box {
+  stroke-width: 3;
+  fill: none;
+}
+
+.die-box.moving { stroke: #ffd54a; stroke-dasharray: 8 6; }
+.die-box.settling { stroke: #ffb547; }
+.die-box.stable { stroke: #00d68f; }
+
+.die-tag {
+  font: bold 15px 'SF Mono', Menlo, Consolas, 'Microsoft YaHei', monospace;
+  text-anchor: start;
+}
+
+.die-tag rect { opacity: 0.9; }
+.die-tag text { fill: #06130d; font-weight: 700; }
+
+.die-tag.pending { opacity: 0.85; }
+.die-tag.pending text { fill: #fff; }
+
+/* 摄像头模式:结果面板隐藏,实时结果画在画面上 */
+body[data-mode="camera"] .result-pane { display: none; }
+@media (min-width: 901px) {
+  body[data-mode="camera"] .workbench { grid-template-columns: 1fr; }
+  body[data-mode="camera"] .camera-pane { min-height: auto; }
+}
+
 .cam-total {
   background: rgba(0,0,0,0.65);
   color: var(--accent);

@@ -6,4 +6,6 @@ numpy>=1.26
 Pillow>=10.0
 torch>=2.1
 torchvision>=0.16
-# 骰子 OCR 走阿里云百炼 qwen-vl-ocr，需要 DASHSCOPE_API_KEY 和 bl CLI
+rapidocr_onnxruntime>=1.3.24,<2; python_version < "3.13"
+rapidocr_onnxruntime==1.2.3; python_version >= "3.13"   # 本地 OCR；GPU 部署需兼容的 onnxruntime-gpu
+# 可选:稳定后/上传走百炼 qwen-vl-ocr → 需要 DASHSCOPE_API_KEY 和 bl CLI

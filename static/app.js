@@ -106,8 +106,10 @@ btnRun.addEventListener('click', async () => {
   setStatus('推理中...', 'busy');
 
   const fd = new FormData();
+  fd.append('dice_type', document.getElementById('diceType').value);
   fd.append('task', currentTask);
   fd.append('mode', 'upload');
+  if (currentTask === 'dice' && upUseApi && upUseApi.checked) fd.append('api', '1');
   fd.append('image', currentFile);
 
   try {
@@ -158,8 +160,8 @@ function renderSummary(data) {
       html += '<div class="block-list">';
       diceList.forEach((d, i) => {
         html += `<div class="dice-row">
-          <div class="dice-value">${d.value}</div>
-          <div style="color:var(--muted);font-size:11px;">#${i+1}</div>
+          <div class="dice-value">${d.value ?? "待确认"}</div>
+          <div style="color:var(--muted);font-size:11px;">#${i+1} · ${d.dice_type || 'unknown'}${d.source ? ' · ' + d.source : ''}</div>
           <div class="block-bbox">[${d.bbox.join(', ')}]</div>
         </div>`;
       });
@@ -193,7 +195,11 @@ function setStatus(msg, cls) {
 }
 
 // =====================================================================
-// 摄像头实时识别
+// 摄像头实时识别(两阶段:实时拉框跟随 → 稳定后后台 OCR)
+// 服务端按 session 保留跟踪状态,每帧响应带每颗骰的 state:
+//   moving  = 骰子在动,只拉框不读值
+//   settling= 刚停下,正在累计稳定帧
+//   stable  = 已稳定,value 有值(OCR 缓存)或正在后台 OCR
 // =====================================================================
 const camVideo = document.getElementById('camVideo');
 const camOverlay = document.getElementById('camOverlay');
@@ -201,24 +207,32 @@ const camTotal = document.getElementById('camTotal');
 const camFps = document.getElementById('camFps');
 const camMs = document.getElementById('camMs');
 const camError = document.getElementById('camError');
+const camStateEl = document.getElementById('camState');
 const btnCamStart = document.getElementById('btnCamStart');
 const btnCamStop = document.getElementById('btnCamStop');
 const camIntervalSel = document.getElementById('camInterval');
 const camUseApi = document.getElementById('camUseApi');
+const upUseApi = document.getElementById('upUseApi');
 
 let camStream = null;
-let camTimer = null;
-let camInFlight = false;
+let camTimer = null;          // setTimeout 句柄(自适应循环,非固定间隔)
+let camRunning = false;
+let camSessionId = null;
 let camFrameCount = 0;
 let camFpsT0 = 0;
+let lastFrameWasStable = false;
 
 btnCamStart.addEventListener('click', startCamera);
 btnCamStop.addEventListener('click', stopCamera);
 
+function newSessionId() {
+  return 'cam-' + Date.now().toString(36) + '-' +
+         Math.random().toString(36).slice(2, 10);
+}
+
 async function startCamera() {
   camError.classList.add('hidden');
   try {
-    // 手机网络宽高小一些，省流量 + 加快后端处理
     const isMobile = /Mobi|Android|iPhone/i.test(navigator.userAgent);
     camStream = await navigator.mediaDevices.getUserMedia({
       video: {
@@ -235,7 +249,6 @@ async function startCamera() {
   }
   camVideo.srcObject = camStream;
   await new Promise(r => camVideo.onloadedmetadata = r);
-  // canvas 同步 video 原生尺寸（坐标用它做参照）
   camOverlay.width = camVideo.videoWidth;
   camOverlay.height = camVideo.videoHeight;
   camVideo.play().catch(() => {});
@@ -244,23 +257,39 @@ async function startCamera() {
   btnCamStop.disabled = false;
   camFrameCount = 0;
   camFpsT0 = performance.now();
+  camSessionId = newSessionId();     // 每个会话独立跟踪状态
+  camRunning = true;
+  lastFrameWasStable = false;
+  camStateEl.textContent = '启动中';
+  camStateEl.className = 'cam-state working';
 
-  const tick = () => {
-    if (!camStream) return;
-    if (!camInFlight) {
-      camInFlight = true;
-      captureAndInfer().finally(() => { camInFlight = false; });
+  // 自适应循环:处理完一帧再调度下一帧,间隔 = max(目标, 实测耗时+余量),
+  // 避免请求积压雪崩;全部骰子已稳定读出时自动降频省资源
+  const loop = async () => {
+    if (!camRunning || !camStream) return;
+    const started = performance.now();
+    await captureAndInfer();
+    if (!camRunning) return;
+    const cost = performance.now() - started;
+    let base = parseInt(camIntervalSel.value, 10) || 125;
+    if (lastFrameWasStable) base = Math.max(base, 220);   // 稳定后不必高帧率
+    const next = Math.max(base, cost + 30);
+    camTimer = setTimeout(loop, next);
+  };
+  loop();
+  // 切换帧率档位时,立即按新档位重启循环
+  camIntervalSel.onchange = () => {
+    if (camRunning) {
+      if (camTimer) clearTimeout(camTimer);
+      loop();
     }
   };
-  // 间隔根据实际耗时自适应：处理 2s 自动降到 ~1 FPS，避免雪崩
-  const baseInterval = parseInt(camIntervalSel.value, 10);
-  camTimer = setInterval(tick, baseInterval);
-  // 同步显示当前目标
-  camFps.textContent = (1000 / baseInterval).toFixed(0);
 }
 
 function stopCamera() {
-  if (camTimer) { clearInterval(camTimer); camTimer = null; }
+  camRunning = false;
+  if (camTimer) { clearTimeout(camTimer); camTimer = null; }
+  camIntervalSel.onchange = null;
   if (camStream) {
     camStream.getTracks().forEach(t => t.stop());
     camStream = null;
@@ -272,83 +301,65 @@ function stopCamera() {
   camTotal.textContent = '0';
   camFps.textContent = '--';
   camMs.textContent = '--';
+  camStateEl.textContent = '已停止';
+  camStateEl.className = 'cam-state waiting';
 }
 
-// 稳定 bbox 跟踪：相同 bbox 出现 N 帧后，调用 API 校准一次，结果缓存到位置变化
-const stableTracker = new Map();  // key: "x1,y1,x2,y2" → { value, frames, lastSeen, source }
-let apiPending = false;
-let apiCooldownUntil = 0;
-
-function bboxKey(b) { return b.map(v => Math.round(v / 20) * 20).join(','); }
-
 async function captureAndInfer() {
-  const targetW = Math.min(camVideo.videoWidth, 1280);
-  const targetH = Math.round(camVideo.videoHeight * targetW / camVideo.videoWidth);
+  // 取视频当前帧画到离屏 canvas(与 video 同尺寸,避免重复缩放)
+  const vw = camVideo.videoWidth, vh = camVideo.videoHeight;
+  if (!vw || !vh) return;
   const off = document.createElement('canvas');
-  off.width = targetW;
-  off.height = targetH;
-  const ctx = off.getContext('2d');
-  ctx.drawImage(camVideo, 0, 0, targetW, targetH);
-  // 质量 0.82：摄像头帧质量关键，OCR 误读很大程度来自压缩
+  off.width = vw;
+  off.height = vh;
+  const ctx = off.getContext('2d', { willReadFrequently: true });
+  ctx.drawImage(camVideo, 0, 0, vw, vh);
+  // 质量 0.82:太高影响速度,太低影响 OCR
   const blob = await new Promise(r => off.toBlob(r, 'image/jpeg', 0.82));
 
-  // 决策：是否走 API
-  //  - 手动勾选：每帧都走（费配额）
-  //  - 自动：同 bbox 稳定 2 帧后切 API 校准，缓存结果直到 bbox 移动
-  const useApi = camUseApi.checked || (stableTracker.size > 0 && !apiPending && performance.now() > apiCooldownUntil);
-
   const fd = new FormData();
+  fd.append('dice_type', document.getElementById('diceType').value);
   fd.append('task', 'dice');
   fd.append('mode', 'camera');
-  if (useApi) fd.append('api', '1');
+  fd.append('session', camSessionId);
+  if (camUseApi.checked) fd.append('api', '1');  // 稳定后读值走百炼
   fd.append('image', blob, 'frame.jpg');
 
   const t0 = performance.now();
   try {
-    if (useApi) apiPending = true;
     const r = await fetch('/api/infer', { method: 'POST', body: fd });
     if (!r.ok) return;
     const data = await r.json();
-    const scaleX = camVideo.videoWidth / targetW;
-    const scaleY = camVideo.videoHeight / targetH;
-    let scaled = (data.dice || []).map(d => ({
-      bbox: [d.bbox[0]*scaleX, d.bbox[1]*scaleY, d.bbox[2]*scaleX, d.bbox[3]*scaleY],
-      value: d.value,
-    }));
+    // 后端 bbox 在原始帧(与 canvas 同尺寸)坐标系,overlay 与其一致,无需缩放
+    const dice = data.dice || [];
+    lastFrameWasStable = !!data.all_settled;
 
-    // 自动模式：把 API 值缓存到稳定的 bbox
-    if (!camUseApi.checked && useApi) {
-      const apiMap = new Map(scaled.map(d => [bboxKey(d.bbox), d.value]));
-      scaled = scaled.map(d => {
-        const k = bboxKey(d.bbox);
-        const cached = stableTracker.get(k);
-        const apiV = apiMap.get(k);
-        if (apiV) {
-          stableTracker.set(k, { value: apiV, frames: 999, source: 'api' });
-          return { ...d, value: apiV, source: 'api' };
-        }
-        return d;
-      });
-      apiCooldownUntil = performance.now() + 3000;  // 3s 冷却，避免连续 API 调用
-    } else if (!camUseApi.checked) {
-      // 本地帧：更新稳定计数
-      const seen = new Set();
-      scaled.forEach(d => {
-        const k = bboxKey(d.bbox);
-        seen.add(k);
-        const cur = stableTracker.get(k);
-        if (cur) stableTracker.set(k, { ...cur, frames: cur.frames + 1, lastSeen: performance.now() });
-        else stableTracker.set(k, { value: d.value, frames: 1, lastSeen: performance.now(), source: 'local' });
-      });
-      // 清理超时
-      for (const [k, v] of stableTracker) {
-        if (performance.now() - v.lastSeen > 2000) stableTracker.delete(k);
-      }
+    camMs.textContent = data.det_ms != null ? data.det_ms : data.elapsed_ms;
+    // 总值只统计已稳定读出的骰子
+    const stableVals = dice.filter(d => d.state === 'stable' && d.value != null);
+    camTotal.textContent = stableVals.reduce((s, d) => s + d.value, 0);
+
+    // 状态徽标
+    const gaveUp = dice.filter(d => d.state === 'stable' && d.ocr_gave_up).length;
+    if (dice.length === 0) {
+      camStateEl.textContent = '未检测到骰子';
+      camStateEl.className = 'cam-state waiting';
+    } else if (stableVals.length === dice.length) {
+      camStateEl.textContent = `✓ ${stableVals.length} 颗已读出`;
+      camStateEl.className = 'cam-state stable';
+    } else if (gaveUp > 0) {
+      camStateEl.textContent = `${gaveUp} 颗读不出(角度/光线)`;
+      camStateEl.className = 'cam-state working';
+    } else if (dice.some(d => d.state === 'stable')) {
+      const moving = dice.filter(d => d.state !== 'stable').length;
+      camStateEl.textContent = moving > 0 ? `稳定中 · ${moving} 颗在动` : '稳定,读取中…';
+      camStateEl.className = 'cam-state working';
+    } else {
+      camStateEl.textContent = '骰子滚动中…';
+      camStateEl.className = 'cam-state working';
     }
 
-    camMs.textContent = data.elapsed_ms;
-    camTotal.textContent = scaled.reduce((s, d) => s + d.value, 0);
-    drawOverlay(scaled);
+    drawOverlay(dice);
     camFrameCount++;
     const fpsDt = (performance.now() - camFpsT0) / 1000;
     if (fpsDt >= 1) {
@@ -357,26 +368,43 @@ async function captureAndInfer() {
       camFpsT0 = performance.now();
     }
   } catch (e) {
-  } finally {
-    if (useApi) apiPending = false;
+    // 网络抖动忽略,下一帧会继续
   }
 }
 
 function drawOverlay(dice) {
   const c = camOverlay.getContext('2d');
-  c.clearRect(0, 0, camOverlay.width, camOverlay.height);
+  const W = camOverlay.width, H = camOverlay.height;
+  c.clearRect(0, 0, W, H);
   c.lineWidth = 3;
-  c.font = 'bold 28px sans-serif';
   for (const d of dice) {
-    const [x1, y1, x2, y2] = d.bbox;
-    c.strokeStyle = '#00c864';
-    c.strokeRect(x1, y1, x2 - x1, y2 - y1);
-    const text = String(d.value);
-    const w = c.measureText(text).width;
-    c.fillStyle = '#00c864';
-    c.fillRect(x1, y1 - 36, w + 16, 36);
-    c.fillStyle = '#fff';
-    c.fillText(text, x1 + 8, y1 - 8);
+    const [x1, y1, x2, y2] = d.bbox.map(Math.round);
+    const w = x2 - x1, h = y2 - y1;
+    const st = d.state === 'stable' ? 'stable'
+             : d.state === 'settling' ? 'settling' : 'moving';
+    c.strokeStyle = st === 'stable' ? '#00d68f'
+                  : st === 'settling' ? '#ffb547' : '#ffd54a';
+    c.setLineDash(st === 'moving' ? [10, 7] : []);
+    c.strokeRect(x1, y1, w, h);
+    c.setLineDash([]);
+
+    // 标签:稳定且有值 → 绿色实心;正在后台 OCR → 灰"…";移动中不标数字
+    let label = null;
+    let tagColor = null;
+    if (st === 'stable') {
+      if (d.value != null) { label = String(d.value); tagColor = '#00d68f'; }
+      else if (d.ocr_gave_up) { label = '?'; tagColor = 'rgba(255,180,80,0.9)'; }
+      else { label = '…'; tagColor = 'rgba(120,126,140,0.9)'; }
+    }
+    if (label) {
+      c.font = 'bold 26px sans-serif';
+      const tw = c.measureText(label).width;
+      const bx = x1, by = y1 - 40;
+      c.fillStyle = tagColor;
+      c.fillRect(bx, by, tw + 18, 36);
+      c.fillStyle = '#06130d';
+      c.fillText(label, bx + 9, by + 26);
+    }
   }
 }
 
@@ -386,8 +414,8 @@ async function refreshStatus() {
     const r = await fetch('/healthz');
     const d = await r.json();
     document.getElementById('devName').textContent = d.device;
+    document.getElementById('diceBackend').textContent = d.dice_detector.backend.toUpperCase() + (d.dice_detector.warning ? ' · ' + d.dice_detector.warning : ' · 七类模型');
     document.getElementById('msDoc').textContent = d.models.doclayout ? '已就绪' : '未加载';
-    document.getElementById('msDice').textContent = d.models.dice ? '已就绪' : '未加载';
   } catch {}
 }
 refreshStatus();
