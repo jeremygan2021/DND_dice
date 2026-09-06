@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>YOLO Web Studio · 骰子 & 版面</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+</head>
+<body>
+  <header>
+    <h1>🎲 YOLO Web Studio</h1>
+    <p class="subtitle">跑团骰子点数识别 · 文档版面拉框（魔搭模型）</p>
+  </header>
+
+  <main>
+    <section class="task-bar">
+      <button class="task-btn active" data-task="dice">
+        <span class="emoji">🎲</span>
+        <span class="label">跑团骰子</span>
+        <span class="hint">检测多颗骰子 · 读点数 · 输出总数</span>
+      </button>
+      <button class="task-btn" data-task="doclayout">
+        <span class="emoji">📖</span>
+        <span class="label">文档版面拉框</span>
+        <span class="hint">标题/段落/图/表/页眉 · 10 类</span>
+      </button>
+    </section>
+
+    <section class="mode-bar">
+      <button class="mode-btn active" data-mode="upload">📁 上传图片</button>
+      <button class="mode-btn" data-mode="camera">📷 实时摄像头</button>
+    </section>
+
+    <section class="workbench">
+      <!-- 上传模式 -->
+      <div class="pane upload-pane" id="uploadPane">
+        <div class="drop-zone" id="dropZone">
+          <input type="file" id="fileInput" accept="image/*" hidden />
+          <div class="dz-empty">
+            <div class="dz-icon">⬆</div>
+            <div class="dz-text">拖拽图片到此处，或点击选择</div>
+            <div class="dz-hint">支持 JPG / PNG，最大 32MB</div>
+          </div>
+          <img id="previewImg" alt="预览" />
+        </div>
+
+        <div class="actions">
+          <button id="btnRun" class="btn-primary" disabled>开始推理</button>
+          <button id="btnClear" class="btn-ghost">清除</button>
+          <span class="status" id="statusText"></span>
+        </div>
+      </div>
+
+      <!-- 摄像头模式 -->
+      <div class="pane camera-pane hidden" id="cameraPane">
+        <div class="cam-hint" id="camHint">
+          📱 手机/其他设备访问：<code id="lanUrl">--</code>（首次需在浏览器点「高级 → 继续前往」接受自签名证书）
+        </div>
+        <div class="cam-stage">
+          <video id="camVideo" autoplay playsinline muted></video>
+          <canvas id="camOverlay"></canvas>
+          <div class="cam-hud">
+            <div class="cam-total">总点数: <span id="camTotal">0</span></div>
+            <div class="cam-meta"><span id="camFps">--</span> FPS · <span id="camMs">--</span> ms</div>
+          </div>
+          <div class="cam-error hidden" id="camError"></div>
+        </div>
+        <div class="actions">
+          <button id="btnCamStart" class="btn-primary">▶ 开始识别</button>
+          <button id="btnCamStop" class="btn-ghost" disabled>■ 停止</button>
+          <label class="cam-fps-label">
+            帧间隔
+            <select id="camInterval">
+              <option value="80">~12 FPS</option>
+              <option value="125" selected>~8 FPS</option>
+              <option value="200">~5 FPS</option>
+              <option value="333">~3 FPS</option>
+            </select>
+          </label>
+          <label class="cam-fps-label">
+            <input type="checkbox" id="camUseApi" />
+            走百炼（更准更慢）
+          </label>
+        </div>
+      </div>
+
+      <div class="pane result-pane">
+        <div class="result-image-wrap">
+          <img id="resultImg" alt="结果" />
+          <div class="empty-state" id="emptyState">
+            <div class="empty-icon">🖼</div>
+            <div class="empty-text">等待上传图片</div>
+          </div>
+        </div>
+        <div class="result-summary" id="resultSummary"></div>
+      </div>
+    </section>
+
+    <section class="model-status" id="modelStatus">
+      <span class="dot"></span>
+      <span>设备: <code id="devName">--</code></span>
+      <span class="sep">·</span>
+      <span>doclayout: <code id="msDoc">未加载</code></span>
+      <span class="sep">·</span>
+      <span>dice: <code id="msDice">未加载</code></span>
+    </section>
+  </main>
+
+  <script src="{{ url_for('static', filename='app.js') }}"></script>
+</body>
+</html>

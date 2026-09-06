@@ -1,0 +1,9 @@
+flask>=3.0
+ultralytics>=8.2
+modelscope>=1.18
+opencv-python-headless>=4.9
+numpy>=1.26
+Pillow>=10.0
+torch>=2.1
+torchvision>=0.16
+# 骰子 OCR 走阿里云百炼 qwen-vl-ocr，需要 DASHSCOPE_API_KEY 和 bl CLI
