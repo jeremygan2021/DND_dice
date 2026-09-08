@@ -1,0 +1,31 @@
+{
+  "model": "claude-sonnet-5",
+  "labels": [
+    {
+      "type": "d10",
+      "value": 8,
+      "confidence": 0.45,
+      "box": {
+        "x": 0,
+        "y": 0.42,
+        "w": 0.18,
+        "h": 0.2
+      }
+    },
+    {
+      "type": "d10",
+      "value": 8,
+      "confidence": 0.4,
+      "box": {
+        "x": 0.12,
+        "y": 0.63,
+        "w": 0.16,
+        "h": 0.19
+      }
+    }
+  ],
+  "warnings": [
+    "Both dice are tilted/leaning against the tray edge, showing multiple side faces (6/9, 2, 8) rather than a clear top face; the reading of 8 as the up-facing value is uncertain.",
+    "Numbers 6 and 9 are ambiguous without a clear orientation mark visible in the image."
+  ]
+}

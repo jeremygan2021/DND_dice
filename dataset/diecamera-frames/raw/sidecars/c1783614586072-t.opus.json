@@ -1,0 +1,31 @@
+{
+  "model": "claude-sonnet-5",
+  "labels": [
+    {
+      "type": "d10",
+      "value": 10,
+      "confidence": 0.85,
+      "box": {
+        "x": 0.11,
+        "y": 0.6,
+        "w": 0.18,
+        "h": 0.19
+      }
+    },
+    {
+      "type": "d12",
+      "value": 4,
+      "confidence": 0.85,
+      "box": {
+        "x": 0.2,
+        "y": 0.72,
+        "w": 0.2,
+        "h": 0.2
+      }
+    }
+  ],
+  "warnings": [
+    "Green d10 top face is angled slightly and glossy, confidence reduced.",
+    "White d12 die appears tilted; the 4 face is read but neighboring faces are close in visibility."
+  ]
+}

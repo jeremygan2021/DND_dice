@@ -1,0 +1,30 @@
+{
+  "model": "claude-sonnet-5",
+  "labels": [
+    {
+      "type": "d12",
+      "value": 9,
+      "confidence": 0.6,
+      "box": {
+        "x": 0.6,
+        "y": 0.27,
+        "w": 0.19,
+        "h": 0.19
+      }
+    },
+    {
+      "type": "d12",
+      "value": 10,
+      "confidence": 0.75,
+      "box": {
+        "x": 0.68,
+        "y": 0.73,
+        "w": 0.19,
+        "h": 0.19
+      }
+    }
+  ],
+  "warnings": [
+    "Green d12 top face number could be 6 or 9 depending on orientation; underline mark not clearly visible, so confidence lowered."
+  ]
+}

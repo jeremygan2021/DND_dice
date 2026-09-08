@@ -1,0 +1,88 @@
+{
+  "model": "claude-sonnet-5",
+  "labels": [
+    {
+      "type": "d6",
+      "value": 2,
+      "confidence": 0.6,
+      "box": {
+        "x": 0,
+        "y": 0.16,
+        "w": 0.16,
+        "h": 0.2
+      }
+    },
+    {
+      "type": "d20",
+      "value": 16,
+      "confidence": 0.45,
+      "box": {
+        "x": 0.35,
+        "y": 0.16,
+        "w": 0.24,
+        "h": 0.26
+      }
+    },
+    {
+      "type": "d4",
+      "value": 3,
+      "confidence": 0.4,
+      "box": {
+        "x": 0.4,
+        "y": 0.36,
+        "w": 0.16,
+        "h": 0.2
+      }
+    },
+    {
+      "type": "d10",
+      "value": 8,
+      "confidence": 0.55,
+      "box": {
+        "x": 0.6,
+        "y": 0.32,
+        "w": 0.18,
+        "h": 0.18
+      }
+    },
+    {
+      "type": "d6",
+      "value": 3,
+      "confidence": 0.75,
+      "box": {
+        "x": 0.18,
+        "y": 0.66,
+        "w": 0.15,
+        "h": 0.15
+      }
+    },
+    {
+      "type": "d6",
+      "value": 5,
+      "confidence": 0.6,
+      "box": {
+        "x": 0.08,
+        "y": 0.82,
+        "w": 0.16,
+        "h": 0.16
+      }
+    },
+    {
+      "type": "d10",
+      "value": 6,
+      "confidence": 0.4,
+      "box": {
+        "x": 0.58,
+        "y": 0.63,
+        "w": 0.2,
+        "h": 0.18
+      }
+    }
+  ],
+  "warnings": [
+    "d20 die (blue) is angled/glossy; top face read as 16 but could be misread due to surrounding numbers visible (1,19,18,11,etc.) - low confidence.",
+    "d4 (pink, pointing up) value read from visible edge numbers, actual top face ambiguous - low confidence.",
+    "Pink d10 in lower right shows overlapping digits (1,6,9) making the true up-face uncertain, reported as 6 with low confidence.",
+    "Yellow d6 partially cropped at left edge, only partial faces visible."
+  ]
+}

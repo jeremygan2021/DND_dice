@@ -1,0 +1,28 @@
+{
+  "model": "claude-sonnet-5",
+  "labels": [
+    {
+      "type": "d12",
+      "value": 12,
+      "confidence": 0.9,
+      "box": {
+        "x": 0,
+        "y": 0.14,
+        "w": 0.19,
+        "h": 0.19
+      }
+    },
+    {
+      "type": "d12",
+      "value": 12,
+      "confidence": 0.9,
+      "box": {
+        "x": 0.13,
+        "y": 0.44,
+        "w": 0.19,
+        "h": 0.19
+      }
+    }
+  ],
+  "warnings": []
+}

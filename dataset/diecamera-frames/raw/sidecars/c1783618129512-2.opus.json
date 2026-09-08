@@ -1,0 +1,7 @@
+{
+  "model": "claude-sonnet-5",
+  "labels": [],
+  "warnings": [
+    "A small pink triangular object (possibly a d4 die) is visible at approximately x=0.03-0.19, y=0.39-0.51, but it is resting on a point/edge with no clear flat top face visible, and no numbers are legibly readable due to glare and angle. Not reported as a confident die read."
+  ]
+}

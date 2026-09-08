@@ -1,0 +1,89 @@
+{
+  "model": "claude-sonnet-5",
+  "labels": [
+    {
+      "type": "d10",
+      "value": 0,
+      "confidence": 0.6,
+      "box": {
+        "x": 0.58,
+        "y": 0,
+        "w": 0.19,
+        "h": 0.19
+      }
+    },
+    {
+      "type": "d6",
+      "value": 4,
+      "confidence": 0.85,
+      "box": {
+        "x": 0.55,
+        "y": 0.44,
+        "w": 0.17,
+        "h": 0.17
+      }
+    },
+    {
+      "type": "d10",
+      "value": 4,
+      "confidence": 0.55,
+      "box": {
+        "x": 0.68,
+        "y": 0.4,
+        "w": 0.16,
+        "h": 0.16
+      }
+    },
+    {
+      "type": "d4",
+      "value": 2,
+      "confidence": 0.4,
+      "box": {
+        "x": 0.44,
+        "y": 0.55,
+        "w": 0.16,
+        "h": 0.16
+      }
+    },
+    {
+      "type": "d6",
+      "value": 2,
+      "confidence": 0.85,
+      "box": {
+        "x": 0.6,
+        "y": 0.58,
+        "w": 0.16,
+        "h": 0.16
+      }
+    },
+    {
+      "type": "d10",
+      "value": 4,
+      "confidence": 0.35,
+      "box": {
+        "x": 0.77,
+        "y": 0.53,
+        "w": 0.16,
+        "h": 0.16
+      }
+    },
+    {
+      "type": "d20",
+      "value": 11,
+      "confidence": 0.6,
+      "box": {
+        "x": 0,
+        "y": 0.78,
+        "w": 0.19,
+        "h": 0.19
+      }
+    }
+  ],
+  "warnings": [
+    "Pink d10 (top) shows a digit that could be 0 with underline dot near '9' and '4' side faces visible; top face read as 0 with low-medium confidence due to glare.",
+    "Red/maroon d4 in center is resting on a point/edge with multiple faces visible; top value uncertain, read as 2 but could be misread - low confidence.",
+    "Yellow d10 top face appears angled; read as 4 but could be ambiguous due to viewing angle.",
+    "Pink/magenta d10 (right) is glossy and partially angled; value read as 4 but confidence is low.",
+    "Blue d20 at bottom-left is partially cut off by image edge; numbers 18,10,11 visible on side faces, top face read as 11 with medium confidence."
+  ]
+}

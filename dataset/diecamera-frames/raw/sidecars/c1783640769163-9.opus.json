@@ -1,0 +1,52 @@
+{
+  "model": "claude-sonnet-5",
+  "labels": [
+    {
+      "type": "d6",
+      "value": 6,
+      "confidence": 0.9,
+      "box": {
+        "x": 0.44,
+        "y": 0.11,
+        "w": 0.14,
+        "h": 0.15
+      }
+    },
+    {
+      "type": "d6",
+      "value": 3,
+      "confidence": 0.85,
+      "box": {
+        "x": 0.6,
+        "y": 0.39,
+        "w": 0.12,
+        "h": 0.13
+      }
+    },
+    {
+      "type": "d6",
+      "value": 1,
+      "confidence": 0.8,
+      "box": {
+        "x": 0.48,
+        "y": 0.48,
+        "w": 0.12,
+        "h": 0.13
+      }
+    },
+    {
+      "type": "d6",
+      "value": 1,
+      "confidence": 0.75,
+      "box": {
+        "x": 0.65,
+        "y": 0.63,
+        "w": 0.11,
+        "h": 0.12
+      }
+    }
+  ],
+  "warnings": [
+    "Black die's face shows a single line/mark; read as 1 but could be a differently styled pip - confidence lowered."
+  ]
+}

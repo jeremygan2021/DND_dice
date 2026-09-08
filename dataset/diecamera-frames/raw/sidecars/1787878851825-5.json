@@ -1,0 +1,37 @@
+{
+  "schemaVersion": 1,
+  "id": "1787878851825-5",
+  "createdAt": "2026-08-28T01:00:51.825Z",
+  "model": "local:dice-shape",
+  "camera": "Triveni's iPhone (2) Camera",
+  "cameraRole": "top-down",
+  "image": "1787878851825-5.jpg",
+  "labels": [
+    {
+      "type": "d20",
+      "value": 7,
+      "confidence": 0.6210835636511902,
+      "box": {
+        "x": 0.6419,
+        "y": 0.5753,
+        "w": 0.2553,
+        "h": 0.214
+      }
+    }
+  ],
+  "modelLabels": [
+    {
+      "type": "d8",
+      "value": 1,
+      "confidence": 0.6210835636511902,
+      "box": {
+        "x": 0.6419,
+        "y": 0.5753,
+        "w": 0.2553,
+        "h": 0.214
+      }
+    }
+  ],
+  "corrected": true,
+  "valuesTrusted": true
+}

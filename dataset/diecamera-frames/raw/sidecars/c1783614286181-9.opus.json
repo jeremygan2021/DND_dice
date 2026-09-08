@@ -1,0 +1,53 @@
+{
+  "model": "claude-sonnet-5",
+  "labels": [
+    {
+      "type": "d6",
+      "value": 5,
+      "confidence": 0.95,
+      "box": {
+        "x": 0.21,
+        "y": 0.19,
+        "w": 0.14,
+        "h": 0.14
+      }
+    },
+    {
+      "type": "d6",
+      "value": 4,
+      "confidence": 0.9,
+      "box": {
+        "x": 0.56,
+        "y": 0.13,
+        "w": 0.16,
+        "h": 0.15
+      }
+    },
+    {
+      "type": "d6",
+      "value": 1,
+      "confidence": 0.95,
+      "box": {
+        "x": 0.06,
+        "y": 0.46,
+        "w": 0.16,
+        "h": 0.16
+      }
+    },
+    {
+      "type": "d4",
+      "value": 1,
+      "confidence": 0.6,
+      "box": {
+        "x": 0.36,
+        "y": 0.5,
+        "w": 0.16,
+        "h": 0.16
+      }
+    }
+  ],
+  "warnings": [
+    "The white diamond-shaped die in the bottom center appears to be a d4 or a d6 rotated 45°; only a single central pip is visible, and its true shape/orientation is uncertain, so value reading confidence is lowered.",
+    "There appears to be a faint square outline in the upper middle area of the tray that may be a die impression or shadow, but no actual die is visible there, so it was not reported."
+  ]
+}

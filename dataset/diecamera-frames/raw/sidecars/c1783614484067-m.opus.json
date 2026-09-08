@@ -1,0 +1,30 @@
+{
+  "model": "claude-sonnet-5",
+  "labels": [
+    {
+      "type": "d10",
+      "value": 5,
+      "confidence": 0.85,
+      "box": {
+        "x": 0.03,
+        "y": 0.66,
+        "w": 0.14,
+        "h": 0.16
+      }
+    },
+    {
+      "type": "d8",
+      "value": 1,
+      "confidence": 0.6,
+      "box": {
+        "x": 0.53,
+        "y": 0.82,
+        "w": 0.15,
+        "h": 0.15
+      }
+    }
+  ],
+  "warnings": [
+    "Green d8 at bottom is partially cut off by the image edge and slightly angled, making the top face reading less certain (value read as 1)."
+  ]
+}

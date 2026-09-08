@@ -1,0 +1,42 @@
+{
+  "model": "claude-sonnet-5",
+  "labels": [
+    {
+      "type": "d6",
+      "value": 2,
+      "confidence": 0.85,
+      "box": {
+        "x": 0,
+        "y": 0.58,
+        "w": 0.16,
+        "h": 0.2
+      }
+    },
+    {
+      "type": "d6",
+      "value": 1,
+      "confidence": 0.85,
+      "box": {
+        "x": 0.68,
+        "y": 0.63,
+        "w": 0.14,
+        "h": 0.16
+      }
+    },
+    {
+      "type": "d4",
+      "value": 4,
+      "confidence": 0.2,
+      "box": {
+        "x": 0.55,
+        "y": 0.47,
+        "w": 0.15,
+        "h": 0.16
+      }
+    }
+  ],
+  "warnings": [
+    "The blue d4 is resting on a point/edge with no single face clearly up; its value could not be read confidently.",
+    "The plastic tray container itself has no dice markings; only three dice are present in the tray."
+  ]
+}

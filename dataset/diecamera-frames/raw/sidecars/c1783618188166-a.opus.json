@@ -1,0 +1,20 @@
+{
+  "model": "claude-sonnet-5",
+  "labels": [
+    {
+      "type": "d6",
+      "value": 6,
+      "confidence": 0.9,
+      "box": {
+        "x": 0.22,
+        "y": 0.53,
+        "w": 0.13,
+        "h": 0.13
+      }
+    }
+  ],
+  "warnings": [
+    "A blue d4 is visible but appears to be resting on a point/edge with no single face clearly up, so its value could not be read.",
+    "A white d6 partially visible at the bottom edge of the image is cut off and occluded, so its value could not be confidently read."
+  ]
+}

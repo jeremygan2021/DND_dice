@@ -1,0 +1,31 @@
+{
+  "model": "claude-sonnet-5",
+  "labels": [
+    {
+      "type": "d10",
+      "value": 0,
+      "confidence": 0.5,
+      "box": {
+        "x": 0.29,
+        "y": 0.46,
+        "w": 0.19,
+        "h": 0.19
+      }
+    },
+    {
+      "type": "d10",
+      "value": 0,
+      "confidence": 0.4,
+      "box": {
+        "x": 0.47,
+        "y": 0.6,
+        "w": 0.13,
+        "h": 0.15
+      }
+    }
+  ],
+  "warnings": [
+    "Black d10 shows both 8 and 0 near the top edge with the die tilted; exact upward face uncertain, best guess 0.",
+    "Pink d10 is tilted/leaning, showing 0 and 8 on visible faces; top face unclear, low confidence."
+  ]
+}

@@ -1,0 +1,8 @@
+{
+  "model": "claude-sonnet-5",
+  "labels": [],
+  "warnings": [
+    "The blue object in the image appears to be a d4 die resting on its edge/point rather than flat on a face, so no single top value can be confidently read.",
+    "Image is blurry and low-contrast, making it difficult to identify any numbers on the die."
+  ]
+}

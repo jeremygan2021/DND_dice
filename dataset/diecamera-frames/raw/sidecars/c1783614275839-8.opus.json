@@ -1,0 +1,50 @@
+{
+  "model": "claude-sonnet-5",
+  "labels": [
+    {
+      "type": "d6",
+      "value": 2,
+      "confidence": 0.9,
+      "box": {
+        "x": 0.4,
+        "y": 0.13,
+        "w": 0.15,
+        "h": 0.15
+      }
+    },
+    {
+      "type": "d6",
+      "value": 2,
+      "confidence": 0.9,
+      "box": {
+        "x": 0.04,
+        "y": 0.28,
+        "w": 0.17,
+        "h": 0.17
+      }
+    },
+    {
+      "type": "d6",
+      "value": 6,
+      "confidence": 0.85,
+      "box": {
+        "x": 0.05,
+        "y": 0.68,
+        "w": 0.18,
+        "h": 0.18
+      }
+    },
+    {
+      "type": "d6",
+      "value": 3,
+      "confidence": 0.9,
+      "box": {
+        "x": 0.36,
+        "y": 0.66,
+        "w": 0.16,
+        "h": 0.16
+      }
+    }
+  ],
+  "warnings": []
+}

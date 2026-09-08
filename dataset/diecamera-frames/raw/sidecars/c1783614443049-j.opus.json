@@ -1,0 +1,31 @@
+{
+  "model": "claude-sonnet-5",
+  "labels": [
+    {
+      "type": "d10",
+      "value": 5,
+      "confidence": 0.55,
+      "box": {
+        "x": 0.68,
+        "y": 0.24,
+        "w": 0.15,
+        "h": 0.16
+      }
+    },
+    {
+      "type": "d10",
+      "value": 6,
+      "confidence": 0.5,
+      "box": {
+        "x": 0.72,
+        "y": 0.79,
+        "w": 0.14,
+        "h": 0.15
+      }
+    }
+  ],
+  "warnings": [
+    "Red d10: top face shows overlapping digits (5 and 9 visible on adjacent faces); die appears slightly tilted, read as 5 with reduced confidence.",
+    "Blue d10: top face ambiguous, could be 6 or 9 depending on orientation mark; die appears slightly tilted near tray edge."
+  ]
+}

@@ -1,0 +1,30 @@
+{
+  "model": "claude-sonnet-5",
+  "labels": [
+    {
+      "type": "d6",
+      "value": 5,
+      "confidence": 0.9,
+      "box": {
+        "x": 0,
+        "y": 0.6,
+        "w": 0.17,
+        "h": 0.17
+      }
+    },
+    {
+      "type": "d6",
+      "value": 3,
+      "confidence": 0.85,
+      "box": {
+        "x": 0.5,
+        "y": 0.48,
+        "w": 0.18,
+        "h": 0.18
+      }
+    }
+  ],
+  "warnings": [
+    "A small dark blue/purple d4 is visible resting on a point/edge near the center, so no single face is clearly up - not reported."
+  ]
+}

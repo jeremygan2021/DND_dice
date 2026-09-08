@@ -1,0 +1,78 @@
+{
+  "model": "claude-sonnet-5",
+  "labels": [
+    {
+      "type": "d10",
+      "value": 3,
+      "confidence": 0.75,
+      "box": {
+        "x": 0.42,
+        "y": 0.11,
+        "w": 0.16,
+        "h": 0.18
+      }
+    },
+    {
+      "type": "d4",
+      "value": 4,
+      "confidence": 0.3,
+      "box": {
+        "x": 0.08,
+        "y": 0.42,
+        "w": 0.2,
+        "h": 0.22
+      }
+    },
+    {
+      "type": "d6",
+      "value": 1,
+      "confidence": 0.35,
+      "box": {
+        "x": 0.05,
+        "y": 0.68,
+        "w": 0.15,
+        "h": 0.15
+      }
+    },
+    {
+      "type": "d10",
+      "value": 10,
+      "confidence": 0.55,
+      "box": {
+        "x": 0.41,
+        "y": 0.58,
+        "w": 0.18,
+        "h": 0.22
+      }
+    },
+    {
+      "type": "d10",
+      "value": 4,
+      "confidence": 0.55,
+      "box": {
+        "x": 0.63,
+        "y": 0.58,
+        "w": 0.16,
+        "h": 0.2
+      }
+    },
+    {
+      "type": "d12",
+      "value": 1,
+      "confidence": 0.5,
+      "box": {
+        "x": 0.82,
+        "y": 0.5,
+        "w": 0.17,
+        "h": 0.22
+      }
+    }
+  ],
+  "warnings": [
+    "Pink d4 is tilted resting on edge/point, top face uncertain - reported best guess with low confidence.",
+    "Pink small d6 is glossy and value dots hard to distinguish, could be 1 or another low number.",
+    "Black d10 near center shows '17' and '10' visible on side faces, top face read as 10 but angle makes this uncertain.",
+    "Black d10 on right shows '9','6','4','0' around it, top face read as 4 but could be ambiguous due to angle.",
+    "Black d12 on far right shows multiple numbers ('6','1','2','3') due to angle, top face read as 1 with low confidence."
+  ]
+}

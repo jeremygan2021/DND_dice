@@ -1,0 +1,55 @@
+{
+  "model": "claude-sonnet-5",
+  "labels": [
+    {
+      "type": "d20",
+      "value": 7,
+      "confidence": 0.75,
+      "box": {
+        "x": 0.02,
+        "y": 0.03,
+        "w": 0.28,
+        "h": 0.25
+      }
+    },
+    {
+      "type": "d6",
+      "value": 3,
+      "confidence": 0.8,
+      "box": {
+        "x": 0.03,
+        "y": 0.17,
+        "w": 0.2,
+        "h": 0.2
+      }
+    },
+    {
+      "type": "d12",
+      "value": 6,
+      "confidence": 0.7,
+      "box": {
+        "x": 0.19,
+        "y": 0.35,
+        "w": 0.24,
+        "h": 0.24
+      }
+    },
+    {
+      "type": "d10",
+      "value": 2,
+      "confidence": 0.75,
+      "box": {
+        "x": 0.4,
+        "y": 0.75,
+        "w": 0.24,
+        "h": 0.24
+      }
+    }
+  ],
+  "warnings": [
+    "Small blue die/token in bottom right corner is mostly occluded/cut off and cannot be identified confidently.",
+    "The pink d6 marked '9' could also be '6' depending on orientation mark, which is not clearly visible.",
+    "d12 top face value could be 6 or 9 due to ambiguous orientation.",
+    "dropped d6 with out-of-range value 9"
+  ]
+}

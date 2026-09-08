@@ -1,0 +1,67 @@
+{
+  "model": "claude-sonnet-5",
+  "labels": [
+    {
+      "type": "d12",
+      "value": 8,
+      "confidence": 0.85,
+      "box": {
+        "x": 0.19,
+        "y": 0.2,
+        "w": 0.2,
+        "h": 0.22
+      }
+    },
+    {
+      "type": "d4",
+      "value": 2,
+      "confidence": 0.5,
+      "box": {
+        "x": 0.6,
+        "y": 0.02,
+        "w": 0.13,
+        "h": 0.15
+      }
+    },
+    {
+      "type": "d10",
+      "value": 4,
+      "confidence": 0.6,
+      "box": {
+        "x": 0.76,
+        "y": 0,
+        "w": 0.17,
+        "h": 0.18
+      }
+    },
+    {
+      "type": "d6",
+      "value": 5,
+      "confidence": 0.75,
+      "box": {
+        "x": 0.32,
+        "y": 0.5,
+        "w": 0.16,
+        "h": 0.16
+      }
+    },
+    {
+      "type": "d20",
+      "value": 1,
+      "confidence": 0.55,
+      "box": {
+        "x": 0.31,
+        "y": 0.68,
+        "w": 0.22,
+        "h": 0.22
+      }
+    }
+  ],
+  "warnings": [
+    "d4 (blue) at top: only two side faces visible clearly, top face value uncertain, read as 2 with low confidence.",
+    "d10 (black) at top right: angle makes it hard to confirm top face; read as 4 but could be affected by tilt.",
+    "d20 (pink) at bottom: multiple numbers visible around edges (9,13,10,6, etc.), top face read as 1 but confidence is low due to angle.",
+    "d4 (yellow) at bottom left: orientation of digits unclear, read as 5 but could be misread due to no visible underline/dot.",
+    "dropped d4 with out-of-range value 5"
+  ]
+}

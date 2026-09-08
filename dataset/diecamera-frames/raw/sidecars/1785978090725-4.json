@@ -1,0 +1,57 @@
+{
+  "schemaVersion": 1,
+  "id": "1785978090725-4",
+  "createdAt": "2026-08-06T01:01:30.726Z",
+  "model": "local:dice-shape",
+  "camera": "Nintendo Switch Camera (057e:206d)",
+  "cameraRole": "top-down",
+  "image": "1785978090725-4.jpg",
+  "labels": [
+    {
+      "type": "d20",
+      "value": 10,
+      "confidence": 0.9967025240568037,
+      "box": {
+        "x": 0.775,
+        "y": 0.0049,
+        "w": 0.1646,
+        "h": 0.2235
+      },
+      "numeral": {
+        "corners": [
+          [
+            0.913,
+            0.1094
+          ],
+          [
+            0.8736,
+            0.1326
+          ],
+          [
+            0.858,
+            0.0827
+          ],
+          [
+            0.8974,
+            0.0595
+          ]
+        ]
+      }
+    }
+  ],
+  "modelLabels": [
+    {
+      "type": "d20",
+      "value": 10,
+      "confidence": 0.9967025240568037,
+      "box": {
+        "x": 0.775,
+        "y": 0.0049,
+        "w": 0.1646,
+        "h": 0.2235
+      }
+    }
+  ],
+  "corrected": false,
+  "valuesTrusted": true
+}

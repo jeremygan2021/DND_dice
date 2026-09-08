@@ -1,0 +1,66 @@
+{
+  "model": "claude-sonnet-5",
+  "labels": [
+    {
+      "type": "d6",
+      "value": 3,
+      "confidence": 0.9,
+      "box": {
+        "x": 0.12,
+        "y": 0.16,
+        "w": 0.17,
+        "h": 0.16
+      }
+    },
+    {
+      "type": "d10",
+      "value": 8,
+      "confidence": 0.55,
+      "box": {
+        "x": 0.37,
+        "y": 0.33,
+        "w": 0.16,
+        "h": 0.15
+      }
+    },
+    {
+      "type": "d4",
+      "value": 4,
+      "confidence": 0.3,
+      "box": {
+        "x": 0.24,
+        "y": 0.44,
+        "w": 0.14,
+        "h": 0.14
+      }
+    },
+    {
+      "type": "d12",
+      "value": 11,
+      "confidence": 0.55,
+      "box": {
+        "x": 0.57,
+        "y": 0.57,
+        "w": 0.15,
+        "h": 0.16
+      }
+    },
+    {
+      "type": "d20",
+      "value": 8,
+      "confidence": 0.4,
+      "box": {
+        "x": 0.42,
+        "y": 0.68,
+        "w": 0.16,
+        "h": 0.17
+      }
+    }
+  ],
+  "warnings": [
+    "Red d4 face is hard to read due to angle/glare; value guessed as 4 with low confidence.",
+    "Blue d10 shows multiple numbers near top (2,8,0); top face read as 8 but could be ambiguous.",
+    "Red d20 shows multiple digits (0,4,5,7,8) clustered; top face estimated as 8 but confidence is low due to steep angle.",
+    "Red d12 top face number is glossy and partly obscured by glare; read as 11 with moderate confidence."
+  ]
+}

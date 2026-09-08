@@ -1,0 +1,43 @@
+{
+  "model": "claude-sonnet-5",
+  "labels": [
+    {
+      "type": "d10",
+      "value": 7,
+      "confidence": 0.7,
+      "box": {
+        "x": 0.57,
+        "y": 0.11,
+        "w": 0.14,
+        "h": 0.16
+      }
+    },
+    {
+      "type": "d20",
+      "value": 12,
+      "confidence": 0.75,
+      "box": {
+        "x": 0.03,
+        "y": 0.79,
+        "w": 0.17,
+        "h": 0.18
+      }
+    },
+    {
+      "type": "d10",
+      "value": 4,
+      "confidence": 0.65,
+      "box": {
+        "x": 0.6,
+        "y": 0.79,
+        "w": 0.14,
+        "h": 0.16
+      }
+    }
+  ],
+  "warnings": [
+    "Black d20 shows multiple side numbers (13,19,18) besides top 12; top face read as 12 with moderate confidence.",
+    "Pink d10 at top may show 6/7 ambiguity depending on orientation mark, confidence lowered.",
+    "Pink d10 at bottom shows 0/9 near top edge; read as 4 for top face but ambiguity with orientation reduces confidence."
+  ]
+}

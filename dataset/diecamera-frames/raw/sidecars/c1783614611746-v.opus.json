@@ -1,0 +1,31 @@
+{
+  "model": "claude-sonnet-5",
+  "labels": [
+    {
+      "type": "d6",
+      "value": 4,
+      "confidence": 0.9,
+      "box": {
+        "x": 0.33,
+        "y": 0.22,
+        "w": 0.16,
+        "h": 0.16
+      }
+    },
+    {
+      "type": "d6",
+      "value": 1,
+      "confidence": 0.85,
+      "box": {
+        "x": 0.02,
+        "y": 0.55,
+        "w": 0.15,
+        "h": 0.16
+      }
+    }
+  ],
+  "warnings": [
+    "The d4 appears tilted/leaning against the d6, making it hard to confirm the true top face; the visible '7' may be a side face rather than the top.",
+    "dropped d4 with out-of-range value 7"
+  ]
+}

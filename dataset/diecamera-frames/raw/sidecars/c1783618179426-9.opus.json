@@ -1,0 +1,30 @@
+{
+  "model": "claude-sonnet-5",
+  "labels": [
+    {
+      "type": "d6",
+      "value": 2,
+      "confidence": 0.9,
+      "box": {
+        "x": 0.4,
+        "y": 0.1,
+        "w": 0.16,
+        "h": 0.15
+      }
+    },
+    {
+      "type": "d6",
+      "value": 4,
+      "confidence": 0.9,
+      "box": {
+        "x": 0.4,
+        "y": 0.53,
+        "w": 0.16,
+        "h": 0.16
+      }
+    }
+  ],
+  "warnings": [
+    "A blue triangular object near the right edge appears to be a broken die fragment or non-die object, not a readable die."
+  ]
+}

@@ -1,0 +1,42 @@
+{
+  "model": "claude-sonnet-5",
+  "labels": [
+    {
+      "type": "d10",
+      "value": 2,
+      "confidence": 0.55,
+      "box": {
+        "x": 0.29,
+        "y": 0.11,
+        "w": 0.14,
+        "h": 0.13
+      }
+    },
+    {
+      "type": "d20",
+      "value": 18,
+      "confidence": 0.75,
+      "box": {
+        "x": 0.17,
+        "y": 0.35,
+        "w": 0.19,
+        "h": 0.19
+      }
+    },
+    {
+      "type": "d8",
+      "value": 2,
+      "confidence": 0.6,
+      "box": {
+        "x": 0.35,
+        "y": 0.72,
+        "w": 0.16,
+        "h": 0.17
+      }
+    }
+  ],
+  "warnings": [
+    "Pink d10 value could be 2 or 5 depending on orientation mark, low confidence due to glare and small size.",
+    "Yellow d8 top face number is somewhat ambiguous, could be 2, confidence lowered due to angle."
+  ]
+}

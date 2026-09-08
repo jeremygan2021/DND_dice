@@ -1,0 +1,7 @@
+{
+  "model": "claude-sonnet-5",
+  "labels": [],
+  "warnings": [
+    "No readable dice found in image; only an empty container is visible with a small blue triangular object (possibly a broken die fragment or unrelated object) in the lower left, which does not show a readable face value."
+  ]
+}

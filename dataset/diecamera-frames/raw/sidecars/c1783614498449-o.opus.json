@@ -1,0 +1,31 @@
+{
+  "model": "claude-sonnet-5",
+  "labels": [
+    {
+      "type": "d8",
+      "value": 3,
+      "confidence": 0.6,
+      "box": {
+        "x": 0.06,
+        "y": 0.79,
+        "w": 0.14,
+        "h": 0.17
+      }
+    },
+    {
+      "type": "d8",
+      "value": 7,
+      "confidence": 0.5,
+      "box": {
+        "x": 0.19,
+        "y": 0.72,
+        "w": 0.15,
+        "h": 0.17
+      }
+    }
+  ],
+  "warnings": [
+    "Green d8 top face partially ambiguous due to angle, could be misread",
+    "Yellow d8 numeral orientation uncertain due to glare"
+  ]
+}

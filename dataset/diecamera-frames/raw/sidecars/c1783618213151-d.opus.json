@@ -1,0 +1,20 @@
+{
+  "model": "claude-sonnet-5",
+  "labels": [
+    {
+      "type": "d20",
+      "value": 1,
+      "confidence": 0.4,
+      "box": {
+        "x": 0.42,
+        "y": 0.62,
+        "w": 0.2,
+        "h": 0.22
+      }
+    }
+  ],
+  "warnings": [
+    "The pink die is only partially visible (cut off at image edge) and tilted on its point, so its value cannot be read.",
+    "The purple d20 is angled with multiple numbers visible near the top (1, 13, 19, 2); the flattest-up face is ambiguous, so confidence is lowered - likely showing '1' but could be misread."
+  ]
+}

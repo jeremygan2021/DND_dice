@@ -1,0 +1,31 @@
+{
+  "model": "claude-sonnet-5",
+  "labels": [
+    {
+      "type": "d4",
+      "value": 4,
+      "confidence": 0.2,
+      "box": {
+        "x": 0.29,
+        "y": 0.21,
+        "w": 0.13,
+        "h": 0.13
+      }
+    },
+    {
+      "type": "d20",
+      "value": 20,
+      "confidence": 0.55,
+      "box": {
+        "x": 0.57,
+        "y": 0.55,
+        "w": 0.15,
+        "h": 0.16
+      }
+    }
+  ],
+  "warnings": [
+    "Blue d4 face is blank/hard to read due to glare - the visible top face shows no clear numeral, so value is a low-confidence guess.",
+    "Red d20 shows multiple numbers (18, 14, 15, 20) near the top area due to angle; picked 20 as the most likely flattest/up face but confidence is moderate since the die appears slightly tilted."
+  ]
+}

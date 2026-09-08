@@ -1,0 +1,32 @@
+{
+  "model": "claude-sonnet-5",
+  "labels": [
+    {
+      "type": "d10",
+      "value": 5,
+      "confidence": 0.55,
+      "box": {
+        "x": 0.07,
+        "y": 0.34,
+        "w": 0.14,
+        "h": 0.14
+      }
+    },
+    {
+      "type": "d10",
+      "value": 3,
+      "confidence": 0.55,
+      "box": {
+        "x": 0.71,
+        "y": 0.69,
+        "w": 0.13,
+        "h": 0.15
+      }
+    }
+  ],
+  "warnings": [
+    "Yellow d10 top face is angled and shows multiple digits (7, 3, 5) near the edges - taking the most upward-facing digit (5) but confidence is reduced due to tilt.",
+    "Black d10 top face is also angled with visible digits (7, 3, 5) - top face read as 3 but could be ambiguous due to tilt.",
+    "Neither die's underline/dot orientation marks are clearly visible, so exact top-face determination is uncertain."
+  ]
+}

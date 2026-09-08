@@ -1,0 +1,36 @@
+{
+  "schemaVersion": 1,
+  "id": "1787013908526-e",
+  "createdAt": "2026-08-18T00:45:08.527Z",
+  "model": "local:dice-shape",
+  "camera": "HD USB Camera (05a3:9520)",
+  "image": "1787013908526-e.jpg",
+  "labels": [
+    {
+      "type": "d20",
+      "value": 18,
+      "confidence": 0.5217535344561295,
+      "box": {
+        "x": 0.7995,
+        "y": 0.603,
+        "w": 0.1941,
+        "h": 0.2022
+      }
+    }
+  ],
+  "modelLabels": [
+    {
+      "type": "d20",
+      "value": 4,
+      "confidence": 0.5217535344561295,
+      "box": {
+        "x": 0.7995,
+        "y": 0.603,
+        "w": 0.1941,
+        "h": 0.2022
+      }
+    }
+  ],
+  "corrected": true,
+  "valuesTrusted": true
+}

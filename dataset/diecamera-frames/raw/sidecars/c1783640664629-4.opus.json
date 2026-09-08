@@ -1,0 +1,76 @@
+{
+  "model": "claude-sonnet-5",
+  "labels": [
+    {
+      "type": "d10",
+      "value": 2,
+      "confidence": 0.75,
+      "box": {
+        "x": 0.265,
+        "y": 0.175,
+        "w": 0.16,
+        "h": 0.16
+      }
+    },
+    {
+      "type": "d20",
+      "value": 6,
+      "confidence": 0.55,
+      "box": {
+        "x": 0.77,
+        "y": 0.17,
+        "w": 0.17,
+        "h": 0.18
+      }
+    },
+    {
+      "type": "d4",
+      "value": 1,
+      "confidence": 0.4,
+      "box": {
+        "x": 0.29,
+        "y": 0.38,
+        "w": 0.16,
+        "h": 0.17
+      }
+    },
+    {
+      "type": "d10",
+      "value": 8,
+      "confidence": 0.85,
+      "box": {
+        "x": 0.59,
+        "y": 0.34,
+        "w": 0.14,
+        "h": 0.15
+      }
+    },
+    {
+      "type": "d6",
+      "value": 1,
+      "confidence": 0.85,
+      "box": {
+        "x": 0.71,
+        "y": 0.58,
+        "w": 0.13,
+        "h": 0.14
+      }
+    },
+    {
+      "type": "d12",
+      "value": 10,
+      "confidence": 0.55,
+      "box": {
+        "x": 0.17,
+        "y": 0.73,
+        "w": 0.16,
+        "h": 0.16
+      }
+    }
+  ],
+  "warnings": [
+    "Red d20 top face partially obscured by glare; value could be 6 or 9, and small dot markers make orientation uncertain.",
+    "Yellow d4 shows edge-on triangular faces with small numbers (1,2,3,4 visible around edges); top value is uncertain and could be misread.",
+    "Green d12 numbers are hard to read due to translucent coloring and angle; value could be 10 or another nearby number."
+  ]
+}

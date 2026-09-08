@@ -1,0 +1,52 @@
+{
+  "model": "claude-sonnet-5",
+  "labels": [
+    {
+      "type": "d6",
+      "value": 6,
+      "confidence": 0.9,
+      "box": {
+        "x": 0.045,
+        "y": 0.135,
+        "w": 0.16,
+        "h": 0.16
+      }
+    },
+    {
+      "type": "d6",
+      "value": 5,
+      "confidence": 0.9,
+      "box": {
+        "x": 0.03,
+        "y": 0.375,
+        "w": 0.16,
+        "h": 0.15
+      }
+    },
+    {
+      "type": "d6",
+      "value": 5,
+      "confidence": 0.9,
+      "box": {
+        "x": 0.08,
+        "y": 0.545,
+        "w": 0.17,
+        "h": 0.16
+      }
+    },
+    {
+      "type": "d20",
+      "value": 13,
+      "confidence": 0.75,
+      "box": {
+        "x": 0.635,
+        "y": 0.13,
+        "w": 0.22,
+        "h": 0.2
+      }
+    }
+  ],
+  "warnings": [
+    "The d20's top face shows 13 but adjacent faces (1, 12, 19, 5, etc.) are also visible due to slight tilt; confidence lowered accordingly."
+  ]
+}

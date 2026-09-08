@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "id": "1787791966047-8",
+  "createdAt": "2026-08-27T00:52:46.047Z",
+  "model": "local:dice-shape",
+  "camera": "Nintendo Switch Camera (057e:206d)",
+  "cameraRole": "top-down",
+  "image": "1787791966047-8.jpg",
+  "labels": [
+    {
+      "type": "d8",
+      "value": 4,
+      "box": {
+        "x": 0.6009308510638297,
+        "y": 0.358983451536643,
+        "w": 0.1,
+        "h": 0.1
+      }
+    }
+  ],
+  "modelLabels": [],
+  "corrected": true,
+  "valuesTrusted": true
+}

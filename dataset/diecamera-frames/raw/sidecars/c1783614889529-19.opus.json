@@ -1,0 +1,80 @@
+{
+  "model": "claude-sonnet-5",
+  "labels": [
+    {
+      "type": "d4",
+      "value": 4,
+      "confidence": 0.3,
+      "box": {
+        "x": 0.4,
+        "y": 0.13,
+        "w": 0.2,
+        "h": 0.2
+      }
+    },
+    {
+      "type": "d8",
+      "value": 2,
+      "confidence": 0.4,
+      "box": {
+        "x": 0.46,
+        "y": 0.38,
+        "w": 0.15,
+        "h": 0.15
+      }
+    },
+    {
+      "type": "d10",
+      "value": 8,
+      "confidence": 0.5,
+      "box": {
+        "x": 0.08,
+        "y": 0.58,
+        "w": 0.15,
+        "h": 0.18
+      }
+    },
+    {
+      "type": "d8",
+      "value": 3,
+      "confidence": 0.5,
+      "box": {
+        "x": 0.55,
+        "y": 0.57,
+        "w": 0.15,
+        "h": 0.15
+      }
+    },
+    {
+      "type": "d20",
+      "value": 17,
+      "confidence": 0.4,
+      "box": {
+        "x": 0.22,
+        "y": 0.78,
+        "w": 0.22,
+        "h": 0.2
+      }
+    },
+    {
+      "type": "d6",
+      "value": 6,
+      "confidence": 0.85,
+      "box": {
+        "x": 0.5,
+        "y": 0.78,
+        "w": 0.15,
+        "h": 0.15
+      }
+    }
+  ],
+  "warnings": [
+    "d4 (pink) appears tilted/leaning on its point, top face value uncertain",
+    "Pink d8 shows '2' but orientation of underline unclear, could be 2 vs other rotation",
+    "d10 (magenta) partially occluded, value 8 read but low confidence on orientation",
+    "d6 pink diamond-oriented, '9' could be '6' depending on underline orientation - chose 9 based on dot placement",
+    "d20 blue shows multiple numbers (8,10,12,17) visible on edges; top face read as 17 but confidence low due to angle",
+    "Yellow d8 top face read as 3, but adjacent faces 5 and other numbers visible, angle may affect accuracy",
+    "dropped d6 with out-of-range value 9"
+  ]
+}

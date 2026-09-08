@@ -1,0 +1,7 @@
+{
+  "model": "claude-sonnet-5",
+  "labels": [],
+  "warnings": [
+    "No dice are visible in this image; it appears to show an empty dice tray/container with only a small blue object (possibly a broken piece or debris) visible, not an actual die."
+  ]
+}

@@ -1,0 +1,41 @@
+{
+  "model": "claude-sonnet-5",
+  "labels": [
+    {
+      "type": "d6",
+      "value": 6,
+      "confidence": 0.9,
+      "box": {
+        "x": 0.75,
+        "y": 0.36,
+        "w": 0.13,
+        "h": 0.11
+      }
+    },
+    {
+      "type": "d6",
+      "value": 6,
+      "confidence": 0.9,
+      "box": {
+        "x": 0.58,
+        "y": 0.81,
+        "w": 0.14,
+        "h": 0.13
+      }
+    },
+    {
+      "type": "d4",
+      "value": 2,
+      "confidence": 0.3,
+      "box": {
+        "x": 0.12,
+        "y": 0.48,
+        "w": 0.11,
+        "h": 0.13
+      }
+    }
+  ],
+  "warnings": [
+    "d4 die is tilted on an edge/point, top face not clearly readable; value shown is a best guess based on visible numbers."
+  ]
+}

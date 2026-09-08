@@ -1,0 +1,31 @@
+{
+  "model": "claude-sonnet-5",
+  "labels": [
+    {
+      "type": "d10",
+      "value": 4,
+      "confidence": 0.7,
+      "box": {
+        "x": 0.03,
+        "y": 0.72,
+        "w": 0.15,
+        "h": 0.15
+      }
+    },
+    {
+      "type": "d10",
+      "value": 8,
+      "confidence": 0.65,
+      "box": {
+        "x": 0.16,
+        "y": 0.83,
+        "w": 0.15,
+        "h": 0.15
+      }
+    }
+  ],
+  "warnings": [
+    "Blue d10 shows '4' clearly but adjacent faces '0' and '6' are partially visible at edges; top face read as 4 with moderate confidence.",
+    "Red d10 shows '8' as top face but angle makes it slightly uncertain; could be tilted."
+  ]
+}

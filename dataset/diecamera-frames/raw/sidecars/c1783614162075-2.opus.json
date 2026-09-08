@@ -1,0 +1,67 @@
+{
+  "model": "claude-sonnet-5",
+  "labels": [
+    {
+      "type": "d6",
+      "value": 1,
+      "confidence": 0.9,
+      "box": {
+        "x": 0.11,
+        "y": 0.19,
+        "w": 0.18,
+        "h": 0.19
+      }
+    },
+    {
+      "type": "d10",
+      "value": 6,
+      "confidence": 0.6,
+      "box": {
+        "x": 0.37,
+        "y": 0.33,
+        "w": 0.17,
+        "h": 0.19
+      }
+    },
+    {
+      "type": "d20",
+      "value": 20,
+      "confidence": 0.5,
+      "box": {
+        "x": 0.32,
+        "y": 0.53,
+        "w": 0.19,
+        "h": 0.19
+      }
+    },
+    {
+      "type": "d12",
+      "value": 5,
+      "confidence": 0.55,
+      "box": {
+        "x": 0.68,
+        "y": 0.53,
+        "w": 0.19,
+        "h": 0.19
+      }
+    },
+    {
+      "type": "d8",
+      "value": 5,
+      "confidence": 0.6,
+      "box": {
+        "x": 0.53,
+        "y": 0.65,
+        "w": 0.16,
+        "h": 0.18
+      }
+    }
+  ],
+  "warnings": [
+    "Blue die in top-right corner is off the tray/heavily occluded by container edge and could not be read.",
+    "d10 (black) value read as 6, but orientation mark unclear, could also be 9.",
+    "d20 (pink) shows multiple numbers near top (20,7,2,5) due to angle; top face read as 20 with lower confidence.",
+    "d12 (black) is angled; top face read as 5 but adjacent faces (4,10,1,9) visible, lowering confidence.",
+    "d8 (yellow) angled slightly; top face read as 5 with adjacent faces (8,1) visible."
+  ]
+}

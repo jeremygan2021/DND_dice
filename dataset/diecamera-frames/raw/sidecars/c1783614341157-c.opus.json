@@ -1,0 +1,32 @@
+{
+  "model": "claude-sonnet-5",
+  "labels": [
+    {
+      "type": "d10",
+      "value": 3,
+      "confidence": 0.5,
+      "box": {
+        "x": 0.06,
+        "y": 0.76,
+        "w": 0.13,
+        "h": 0.15
+      }
+    },
+    {
+      "type": "d10",
+      "value": 2,
+      "confidence": 0.55,
+      "box": {
+        "x": 0.17,
+        "y": 0.79,
+        "w": 0.14,
+        "h": 0.16
+      }
+    }
+  ],
+  "warnings": [
+    "Pink d10 top face partially ambiguous due to angle; could be 3 with underline orientation uncertain.",
+    "Black d10 shows overlapping numbers (8, 2, and partial 9/6) due to tilt; read top face as 2 but confidence lowered.",
+    "Lighting glare on tray reduces contrast, making precise die orientation harder to confirm."
+  ]
+}

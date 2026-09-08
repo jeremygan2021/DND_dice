@@ -1,0 +1,32 @@
+{
+  "model": "claude-sonnet-5",
+  "labels": [
+    {
+      "type": "d4",
+      "value": 3,
+      "confidence": 0.3,
+      "box": {
+        "x": 0.56,
+        "y": 0.36,
+        "w": 0.18,
+        "h": 0.15
+      }
+    },
+    {
+      "type": "d20",
+      "value": 9,
+      "confidence": 0.3,
+      "box": {
+        "x": 0.19,
+        "y": 0.85,
+        "w": 0.19,
+        "h": 0.15
+      }
+    }
+  ],
+  "warnings": [
+    "Pink d4 is a tetrahedron viewed from the side; the top point/face is unclear, so the value is a rough guess based on visible edge numbers.",
+    "Purple d20 is only partially visible at the bottom edge of the tray, partially cropped, making it hard to confirm the top face; numbers visible include 8, 9, and a possible 6/9 ambiguity.",
+    "Lighting is dim and glare/dust on tray reduces contrast, lowering confidence for both dice."
+  ]
+}

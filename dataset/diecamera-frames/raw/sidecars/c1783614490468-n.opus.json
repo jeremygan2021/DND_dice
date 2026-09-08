@@ -1,0 +1,31 @@
+{
+  "model": "claude-sonnet-5",
+  "labels": [
+    {
+      "type": "d8",
+      "value": 7,
+      "confidence": 0.6,
+      "box": {
+        "x": 0.53,
+        "y": 0.66,
+        "w": 0.15,
+        "h": 0.15
+      }
+    },
+    {
+      "type": "d10",
+      "value": 9,
+      "confidence": 0.4,
+      "box": {
+        "x": 0.53,
+        "y": 0.78,
+        "w": 0.15,
+        "h": 0.15
+      }
+    }
+  ],
+  "warnings": [
+    "The yellow d10's top face is partially obscured by the green d8 leaning on it, making the value uncertain; could be 9 or 6 depending on orientation.",
+    "The green d8 appears slightly tilted, so the reading of 7 has moderate confidence."
+  ]
+}

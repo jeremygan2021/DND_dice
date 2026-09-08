@@ -1,0 +1,31 @@
+{
+  "model": "claude-sonnet-5",
+  "labels": [
+    {
+      "type": "d12",
+      "value": 10,
+      "confidence": 0.85,
+      "box": {
+        "x": 0.04,
+        "y": 0.1,
+        "w": 0.24,
+        "h": 0.24
+      }
+    },
+    {
+      "type": "d12",
+      "value": 7,
+      "confidence": 0.8,
+      "box": {
+        "x": 0.14,
+        "y": 0.44,
+        "w": 0.22,
+        "h": 0.22
+      }
+    }
+  ],
+  "warnings": [
+    "Both dice appear to be d12s with the top face reasonably centered; slight blur limits confidence.",
+    "Black d12 top face reads 10, surrounded by 7, 4, 11 which are side faces not top."
+  ]
+}

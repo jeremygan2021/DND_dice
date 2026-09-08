@@ -1,0 +1,76 @@
+{
+  "model": "claude-sonnet-5",
+  "labels": [
+    {
+      "type": "d6",
+      "value": 5,
+      "confidence": 0.85,
+      "box": {
+        "x": 0.49,
+        "y": 0.14,
+        "w": 0.13,
+        "h": 0.15
+      }
+    },
+    {
+      "type": "d8",
+      "value": 7,
+      "confidence": 0.75,
+      "box": {
+        "x": 0.38,
+        "y": 0.27,
+        "w": 0.15,
+        "h": 0.16
+      }
+    },
+    {
+      "type": "d4",
+      "value": 1,
+      "confidence": 0.5,
+      "box": {
+        "x": 0.75,
+        "y": 0.2,
+        "w": 0.15,
+        "h": 0.16
+      }
+    },
+    {
+      "type": "d12",
+      "value": 11,
+      "confidence": 0.8,
+      "box": {
+        "x": 0.58,
+        "y": 0.58,
+        "w": 0.15,
+        "h": 0.16
+      }
+    },
+    {
+      "type": "d10",
+      "value": 3,
+      "confidence": 0.55,
+      "box": {
+        "x": 0.75,
+        "y": 0.57,
+        "w": 0.14,
+        "h": 0.15
+      }
+    },
+    {
+      "type": "d20",
+      "value": 16,
+      "confidence": 0.5,
+      "box": {
+        "x": 0.09,
+        "y": 0.7,
+        "w": 0.18,
+        "h": 0.19
+      }
+    }
+  ],
+  "warnings": [
+    "Red d4 pyramid at top right shows edge numbers ('1' and '25'-like); top face value is ambiguous due to angle, low confidence.",
+    "Red d10 die on right shows overlapping digits (3/5), orientation unclear, could be 3 or 5.",
+    "Purple d20 die at bottom left is tilted, showing multiple side numbers (18,16,19); top face not clearly distinguishable, value guessed as 16 with low confidence."
+  ]
+}

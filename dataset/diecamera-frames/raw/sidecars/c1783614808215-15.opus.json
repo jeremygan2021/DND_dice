@@ -1,0 +1,43 @@
+{
+  "model": "claude-sonnet-5",
+  "labels": [
+    {
+      "type": "d10",
+      "value": 3,
+      "confidence": 0.5,
+      "box": {
+        "x": 0.24,
+        "y": 0.13,
+        "w": 0.15,
+        "h": 0.15
+      }
+    },
+    {
+      "type": "d8",
+      "value": 4,
+      "confidence": 0.7,
+      "box": {
+        "x": 0.53,
+        "y": 0.72,
+        "w": 0.14,
+        "h": 0.16
+      }
+    },
+    {
+      "type": "d20",
+      "value": 1,
+      "confidence": 0.4,
+      "box": {
+        "x": 0.73,
+        "y": 0.66,
+        "w": 0.19,
+        "h": 0.22
+      }
+    }
+  ],
+  "warnings": [
+    "Pink d10 top face shows a '3' but orientation mark unclear, could be read differently.",
+    "Purple d20 top face appears to show '1' but die may be slightly tilted, surrounding numbers (10,4,13,6) partially visible suggest angle; low confidence.",
+    "Green die identified as d8, but exact top face orientation is uncertain due to slight tilt."
+  ]
+}

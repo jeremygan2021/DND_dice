@@ -1,0 +1,43 @@
+{
+  "model": "claude-sonnet-5",
+  "labels": [
+    {
+      "type": "d10",
+      "value": 9,
+      "confidence": 0.6,
+      "box": {
+        "x": 0.03,
+        "y": 0.19,
+        "w": 0.17,
+        "h": 0.19
+      }
+    },
+    {
+      "type": "d20",
+      "value": 20,
+      "confidence": 0.35,
+      "box": {
+        "x": 0.24,
+        "y": 0.63,
+        "w": 0.17,
+        "h": 0.17
+      }
+    },
+    {
+      "type": "d8",
+      "value": 4,
+      "confidence": 0.6,
+      "box": {
+        "x": 0.68,
+        "y": 0.6,
+        "w": 0.15,
+        "h": 0.16
+      }
+    }
+  ],
+  "warnings": [
+    "Black d10 shows '9' or '6'-like digits with an underline near top; read as 9 based on underline orientation, but confidence moderate due to glare.",
+    "Magenta/pink d20 is angled with multiple numbers visible (10,11,12,15,17...); top face unclear, guessed 20 but confidence low - consider excluding.",
+    "Yellow d8 top face shows '4' but die appears slightly tilted; confidence moderate."
+  ]
+}

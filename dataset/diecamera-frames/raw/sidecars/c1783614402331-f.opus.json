@@ -1,0 +1,31 @@
+{
+  "model": "claude-sonnet-5",
+  "labels": [
+    {
+      "type": "d10",
+      "value": 0,
+      "confidence": 0.6,
+      "box": {
+        "x": 0.14,
+        "y": 0.83,
+        "w": 0.13,
+        "h": 0.16
+      }
+    },
+    {
+      "type": "d10",
+      "value": 5,
+      "confidence": 0.55,
+      "box": {
+        "x": 0.65,
+        "y": 0.75,
+        "w": 0.13,
+        "h": 0.18
+      }
+    }
+  ],
+  "warnings": [
+    "Black d10 shows '0' but die is tilted, orientation of top face uncertain, could be reading angled side face rather than true top.",
+    "Blue d10 shows '5' but adjacent face '3' also visible suggesting die is tilted; top face reading uncertain, could be 5 or 6."
+  ]
+}

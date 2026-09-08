@@ -1,0 +1,31 @@
+{
+  "model": "claude-sonnet-5",
+  "labels": [
+    {
+      "type": "d10",
+      "value": 9,
+      "confidence": 0.55,
+      "box": {
+        "x": 0.04,
+        "y": 0.12,
+        "w": 0.2,
+        "h": 0.2
+      }
+    },
+    {
+      "type": "d10",
+      "value": 2,
+      "confidence": 0.5,
+      "box": {
+        "x": 0,
+        "y": 0.32,
+        "w": 0.2,
+        "h": 0.2
+      }
+    }
+  ],
+  "warnings": [
+    "Blue d10 top face shows '9' but orientation mark unclear, could be 6 or 9.",
+    "Red d10 top face shows '2' but could be misread as similar digit due to angle and glare."
+  ]
+}
