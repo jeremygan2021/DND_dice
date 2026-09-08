@@ -1,0 +1,32 @@
+{
+  "model": "claude-sonnet-5",
+  "labels": [
+    {
+      "type": "d20",
+      "value": 3,
+      "confidence": 0.5,
+      "box": {
+        "x": 0.14,
+        "y": 0.07,
+        "w": 0.19,
+        "h": 0.19
+      }
+    },
+    {
+      "type": "d20",
+      "value": 14,
+      "confidence": 0.5,
+      "box": {
+        "x": 0.29,
+        "y": 0.06,
+        "w": 0.19,
+        "h": 0.19
+      }
+    }
+  ],
+  "warnings": [
+    "Both d20s are tilted/leaning near each other, making the top face uncertain; readings estimated from most visible upright numbers.",
+    "First die could be showing 3 or an adjacent face; low confidence due to angle.",
+    "Second die could be showing 14 or an adjacent face; low confidence due to angle."
+  ]
+}

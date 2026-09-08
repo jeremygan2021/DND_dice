@@ -1,0 +1,31 @@
+{
+  "model": "claude-sonnet-5",
+  "labels": [
+    {
+      "type": "d10",
+      "value": 4,
+      "confidence": 0.55,
+      "box": {
+        "x": 0.595,
+        "y": 0.135,
+        "w": 0.12,
+        "h": 0.14
+      }
+    },
+    {
+      "type": "d10",
+      "value": 9,
+      "confidence": 0.4,
+      "box": {
+        "x": 0.75,
+        "y": 0.26,
+        "w": 0.11,
+        "h": 0.13
+      }
+    }
+  ],
+  "warnings": [
+    "Blue d10 top face is tilted; numbers appear as '0' and '4' overlapping edges, so the exact upright top value is uncertain - could be 4.",
+    "Dark green/teal d10 is angled with multiple numbers visible (9, 6, 0) near the top vertex; unable to confidently determine the single flattest-up face, could be 9 or 6."
+  ]
+}

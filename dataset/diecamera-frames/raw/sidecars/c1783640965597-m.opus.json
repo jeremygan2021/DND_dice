@@ -1,0 +1,31 @@
+{
+  "model": "claude-sonnet-5",
+  "labels": [
+    {
+      "type": "d12",
+      "value": 2,
+      "confidence": 0.6,
+      "box": {
+        "x": 0.57,
+        "y": 0.42,
+        "w": 0.14,
+        "h": 0.14
+      }
+    },
+    {
+      "type": "d10",
+      "value": 5,
+      "confidence": 0.7,
+      "box": {
+        "x": 0.58,
+        "y": 0.68,
+        "w": 0.13,
+        "h": 0.13
+      }
+    }
+  ],
+  "warnings": [
+    "Red d12 top face shows '2' but adjacent faces '8' and '9' are also visible due to slight tilt; confidence lowered.",
+    "Black d10 top face shows '5' with adjacent faces '3' and '9' partially visible due to slight tilt; confidence lowered."
+  ]
+}

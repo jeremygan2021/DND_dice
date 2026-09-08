@@ -1,0 +1,21 @@
+{
+  "model": "claude-sonnet-5",
+  "labels": [
+    {
+      "type": "d20",
+      "value": 19,
+      "confidence": 0.55,
+      "box": {
+        "x": 0.595,
+        "y": 0.19,
+        "w": 0.145,
+        "h": 0.17
+      }
+    }
+  ],
+  "warnings": [
+    "Red d20 top face is partially angled; the number could be 19 or 61 depending on orientation mark, lowering confidence.",
+    "Black d12 shows number 17 on the top face but the die appears slightly tilted, so exact top face reading confidence is reduced.",
+    "dropped d12 with out-of-range value 17"
+  ]
+}

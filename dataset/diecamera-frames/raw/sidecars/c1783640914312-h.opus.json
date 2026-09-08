@@ -1,0 +1,32 @@
+{
+  "model": "claude-sonnet-5",
+  "labels": [
+    {
+      "type": "d20",
+      "value": 9,
+      "confidence": 0.65,
+      "box": {
+        "x": 0.19,
+        "y": 0.57,
+        "w": 0.155,
+        "h": 0.16
+      }
+    },
+    {
+      "type": "d20",
+      "value": 16,
+      "confidence": 0.3,
+      "box": {
+        "x": 0.51,
+        "y": 0.75,
+        "w": 0.145,
+        "h": 0.15
+      }
+    }
+  ],
+  "warnings": [
+    "Red d20: top face shows '9' with underline, appears correctly oriented; adjacent faces 8,1,6 visible but not top. Confidence moderate due to slight tilt.",
+    "Purple d20: die is glossy and low-contrast, appears tilted with an edge rather than a face fully up; top value could be 16 or another nearby number, low confidence.",
+    "Purple d20 numbers are hard to distinguish due to color/glare - could also be misread as a different digit pair."
+  ]
+}

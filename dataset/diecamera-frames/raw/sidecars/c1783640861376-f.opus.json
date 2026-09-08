@@ -1,0 +1,30 @@
+{
+  "model": "claude-sonnet-5",
+  "labels": [
+    {
+      "type": "d20",
+      "value": 20,
+      "confidence": 0.9,
+      "box": {
+        "x": 0.345,
+        "y": 0.3,
+        "w": 0.16,
+        "h": 0.16
+      }
+    },
+    {
+      "type": "d20",
+      "value": 3,
+      "confidence": 0.3,
+      "box": {
+        "x": 0.63,
+        "y": 0.185,
+        "w": 0.145,
+        "h": 0.145
+      }
+    }
+  ],
+  "warnings": [
+    "Green die's top face number is unclear due to glare/glossy surface and unusual color-matched markings; reading is a low-confidence guess (could be 3 or 5)."
+  ]
+}

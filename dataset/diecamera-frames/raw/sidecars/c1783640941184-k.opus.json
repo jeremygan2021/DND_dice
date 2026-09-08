@@ -1,0 +1,31 @@
+{
+  "model": "claude-sonnet-5",
+  "labels": [
+    {
+      "type": "d10",
+      "value": 0,
+      "confidence": 0.6,
+      "box": {
+        "x": 0.565,
+        "y": 0.385,
+        "w": 0.115,
+        "h": 0.145
+      }
+    },
+    {
+      "type": "d6",
+      "value": 1,
+      "confidence": 0.45,
+      "box": {
+        "x": 0.745,
+        "y": 0.51,
+        "w": 0.1,
+        "h": 0.13
+      }
+    }
+  ],
+  "warnings": [
+    "The blue d10 is angled slightly; the top face shows '0' but nearby '8' and '2' are on slanted side faces, lowering confidence.",
+    "The white d6 is tilted/resting at an angle with multiple faces visible ('1', '3', '7'-like markings), so the true up face is uncertain."
+  ]
+}

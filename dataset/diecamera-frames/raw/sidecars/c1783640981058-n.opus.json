@@ -1,0 +1,31 @@
+{
+  "model": "claude-sonnet-5",
+  "labels": [
+    {
+      "type": "d10",
+      "value": 8,
+      "confidence": 0.75,
+      "box": {
+        "x": 0.335,
+        "y": 0.055,
+        "w": 0.16,
+        "h": 0.16
+      }
+    },
+    {
+      "type": "d10",
+      "value": 10,
+      "confidence": 0.7,
+      "box": {
+        "x": 0.345,
+        "y": 0.365,
+        "w": 0.13,
+        "h": 0.135
+      }
+    }
+  ],
+  "warnings": [
+    "Yellow d10 top face shows '8' but orientation mark not clearly visible, slight confidence reduction.",
+    "Purple d10 shows '10' (or possibly '0'), die appears slightly tilted so reading confidence reduced."
+  ]
+}

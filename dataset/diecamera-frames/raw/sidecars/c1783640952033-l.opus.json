@@ -1,0 +1,31 @@
+{
+  "model": "claude-sonnet-5",
+  "labels": [
+    {
+      "type": "d10",
+      "value": 0,
+      "confidence": 0.6,
+      "box": {
+        "x": 0.815,
+        "y": 0.28,
+        "w": 0.145,
+        "h": 0.155
+      }
+    },
+    {
+      "type": "d10",
+      "value": 0,
+      "confidence": 0.55,
+      "box": {
+        "x": 0.41,
+        "y": 0.45,
+        "w": 0.145,
+        "h": 0.15
+      }
+    }
+  ],
+  "warnings": [
+    "Red d10 is at an angle, showing possibly two faces (0 and 1); top face read as 0 but could be tilted.",
+    "Green d10 face is glossy and partially indistinct; marking appears to show 0 but confidence is limited due to angle."
+  ]
+}
