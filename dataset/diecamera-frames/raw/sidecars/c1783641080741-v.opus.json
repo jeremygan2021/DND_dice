@@ -1,0 +1,30 @@
+{
+  "model": "claude-sonnet-5",
+  "labels": [
+    {
+      "type": "d12",
+      "value": 4,
+      "confidence": 0.85,
+      "box": {
+        "x": 0.26,
+        "y": 0.23,
+        "w": 0.15,
+        "h": 0.16
+      }
+    },
+    {
+      "type": "d12",
+      "value": 3,
+      "confidence": 0.75,
+      "box": {
+        "x": 0.11,
+        "y": 0.35,
+        "w": 0.15,
+        "h": 0.16
+      }
+    }
+  ],
+  "warnings": [
+    "Second d12 top face shows '3' but the underline mark suggests it could be misread as '5' or 'E'; confidence lowered accordingly."
+  ]
+}

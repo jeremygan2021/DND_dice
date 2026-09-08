@@ -1,0 +1,31 @@
+{
+  "model": "claude-sonnet-5",
+  "labels": [
+    {
+      "type": "d12",
+      "value": 2,
+      "confidence": 0.75,
+      "box": {
+        "x": 0.655,
+        "y": 0.21,
+        "w": 0.155,
+        "h": 0.16
+      }
+    },
+    {
+      "type": "d12",
+      "value": 11,
+      "confidence": 0.55,
+      "box": {
+        "x": 0.175,
+        "y": 0.44,
+        "w": 0.145,
+        "h": 0.15
+      }
+    }
+  ],
+  "warnings": [
+    "Yellow d12 top face shows a value that could be read as '11' or '17' depending on orientation of the digits; confidence lowered accordingly.",
+    "Slight glare on both dice may affect reading accuracy."
+  ]
+}

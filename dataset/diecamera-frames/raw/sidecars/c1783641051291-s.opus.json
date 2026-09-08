@@ -1,0 +1,31 @@
+{
+  "model": "claude-sonnet-5",
+  "labels": [
+    {
+      "type": "d8",
+      "value": 7,
+      "confidence": 0.6,
+      "box": {
+        "x": 0.545,
+        "y": 0.215,
+        "w": 0.115,
+        "h": 0.14
+      }
+    },
+    {
+      "type": "d8",
+      "value": 8,
+      "confidence": 0.7,
+      "box": {
+        "x": 0.77,
+        "y": 0.21,
+        "w": 0.115,
+        "h": 0.14
+      }
+    }
+  ],
+  "warnings": [
+    "Yellow d8 top face is angled, showing multiple numbers (7, 5, 9 visible on side faces) - read the most upward face as 7 but confidence is reduced.",
+    "Green d8 shows 8 clearly on top but also has a 5 visible on a side face."
+  ]
+}

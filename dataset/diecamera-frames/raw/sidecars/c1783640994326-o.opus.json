@@ -1,0 +1,31 @@
+{
+  "model": "claude-sonnet-5",
+  "labels": [
+    {
+      "type": "d8",
+      "value": 4,
+      "confidence": 0.55,
+      "box": {
+        "x": 0.5,
+        "y": 0.2,
+        "w": 0.12,
+        "h": 0.14
+      }
+    },
+    {
+      "type": "d8",
+      "value": 6,
+      "confidence": 0.45,
+      "box": {
+        "x": 0.78,
+        "y": 0.26,
+        "w": 0.11,
+        "h": 0.13
+      }
+    }
+  ],
+  "warnings": [
+    "Yellow d8 value could be 4 or 1 depending on orientation mark; low contrast makes it hard to confirm.",
+    "Purple d8 value could be 6 or 9; no clear underline/dot visible to confirm orientation."
+  ]
+}

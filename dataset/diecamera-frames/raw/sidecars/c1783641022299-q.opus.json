@@ -1,0 +1,31 @@
+{
+  "model": "claude-sonnet-5",
+  "labels": [
+    {
+      "type": "d10",
+      "value": 6,
+      "confidence": 0.6,
+      "box": {
+        "x": 0.09,
+        "y": 0.16,
+        "w": 0.19,
+        "h": 0.19
+      }
+    },
+    {
+      "type": "d10",
+      "value": 8,
+      "confidence": 0.75,
+      "box": {
+        "x": 0.62,
+        "y": 0.33,
+        "w": 0.15,
+        "h": 0.15
+      }
+    }
+  ],
+  "warnings": [
+    "Left d10 shows '6' but orientation mark unclear; could possibly be '9' if flipped.",
+    "Both dice are slightly angled, so the read face may not be perfectly top-facing."
+  ]
+}

@@ -1,0 +1,31 @@
+{
+  "model": "claude-sonnet-5",
+  "labels": [
+    {
+      "type": "d8",
+      "value": 4,
+      "confidence": 0.75,
+      "box": {
+        "x": 0.25,
+        "y": 0.31,
+        "w": 0.14,
+        "h": 0.13
+      }
+    },
+    {
+      "type": "d10",
+      "value": 3,
+      "confidence": 0.7,
+      "box": {
+        "x": 0.5,
+        "y": 0.4,
+        "w": 0.13,
+        "h": 0.13
+      }
+    }
+  ],
+  "warnings": [
+    "The d8 shows '4' with another partially visible number near the top edge; the top face reading is somewhat uncertain due to slight tilt.",
+    "The d10 shows '3' but the die appears slightly tilted, so confidence is moderate."
+  ]
+}

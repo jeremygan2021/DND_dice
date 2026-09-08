@@ -1,0 +1,31 @@
+{
+  "model": "claude-sonnet-5",
+  "labels": [
+    {
+      "type": "d10",
+      "value": 3,
+      "confidence": 0.55,
+      "box": {
+        "x": 0.505,
+        "y": 0.03,
+        "w": 0.12,
+        "h": 0.14
+      }
+    },
+    {
+      "type": "d10",
+      "value": 4,
+      "confidence": 0.5,
+      "box": {
+        "x": 0.76,
+        "y": 0.12,
+        "w": 0.13,
+        "h": 0.15
+      }
+    }
+  ],
+  "warnings": [
+    "Yellow d10 top face is ambiguous between 3 and other adjacent digits due to angle; underline mark used to orient as 3.",
+    "Green d10 top face partially shows two numbers (4 and 5) due to slight tilt; read top-most face as 4 but confidence is lowered."
+  ]
+}

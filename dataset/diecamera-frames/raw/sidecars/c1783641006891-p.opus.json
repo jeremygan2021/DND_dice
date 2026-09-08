@@ -1,0 +1,31 @@
+{
+  "model": "claude-sonnet-5",
+  "labels": [
+    {
+      "type": "d8",
+      "value": 8,
+      "confidence": 0.5,
+      "box": {
+        "x": 0.225,
+        "y": 0.19,
+        "w": 0.145,
+        "h": 0.15
+      }
+    },
+    {
+      "type": "d10",
+      "value": 5,
+      "confidence": 0.6,
+      "box": {
+        "x": 0.51,
+        "y": 0.04,
+        "w": 0.135,
+        "h": 0.16
+      }
+    }
+  ],
+  "warnings": [
+    "Green d8 top face shows a symbol that could be 8, orientation is ambiguous due to glossy surface and angle.",
+    "Yellow d10 is tilted slightly, showing possible edge of adjacent face (3); read top face as 5 but confidence reduced."
+  ]
+}
