@@ -1,0 +1,65 @@
+{
+  "model": "claude-sonnet-5",
+  "labels": [
+    {
+      "type": "d4",
+      "value": 4,
+      "confidence": 0.6,
+      "box": {
+        "x": 0.3,
+        "y": 0.13,
+        "w": 0.16,
+        "h": 0.16
+      }
+    },
+    {
+      "type": "d20",
+      "value": 3,
+      "confidence": 0.55,
+      "box": {
+        "x": 0.1,
+        "y": 0.36,
+        "w": 0.2,
+        "h": 0.22
+      }
+    },
+    {
+      "type": "d6",
+      "value": 5,
+      "confidence": 0.9,
+      "box": {
+        "x": 0.68,
+        "y": 0.36,
+        "w": 0.15,
+        "h": 0.15
+      }
+    },
+    {
+      "type": "d6",
+      "value": 5,
+      "confidence": 0.85,
+      "box": {
+        "x": 0.32,
+        "y": 0.58,
+        "w": 0.15,
+        "h": 0.16
+      }
+    },
+    {
+      "type": "d20",
+      "value": 11,
+      "confidence": 0.5,
+      "box": {
+        "x": 0.6,
+        "y": 0.55,
+        "w": 0.2,
+        "h": 0.22
+      }
+    }
+  ],
+  "warnings": [
+    "Yellow d4 shows a 4 near the top but d4s are read by which face points up among the three visible; confidence lowered due to angle.",
+    "Pink d20 top face is ambiguous between 3 and other adjacent numbers due to tilt; confidence lowered.",
+    "Blue d20 shows numbers 9, 11, 13, 4 clustered near top; top-most face is uncertain due to angle, best guess is 11."
+  ]
+}

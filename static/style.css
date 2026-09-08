@@ -226,6 +226,47 @@ main {
 
 .btn-ghost:hover { color: var(--text); border-color: var(--text); }
 
+/* detector 后端选择 + 摄像头设备选择样式 */
+.detector-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 12px 12px 0;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.detector-label select,
+.cam-fps-label select,
+.cam-fps-label input[type="checkbox"] {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-family: inherit;
+  font-size: 13px;
+}
+
+.detector-status {
+  font-size: 11px;
+  padding: 2px 8px;
+  border-radius: 4px;
+  border: 1px solid var(--border);
+}
+
+.detector-status.on {
+  color: var(--accent);
+  border-color: var(--accent);
+  background: var(--accent-dim);
+}
+
+.detector-status.off {
+  color: var(--danger);
+  border-color: var(--danger);
+  background: rgba(255,84,112,0.1);
+}
+
 .status {
   margin-left: auto;
   font-size: 12px;

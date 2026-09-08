@@ -32,14 +32,38 @@
     </section>
 
     <p class="subtitle">混合骰型建议使用七类专用 YOLO 权重；CV 模式仅给出候选框，骰型显示 unknown。
-      D4 采用顶角重复数字一致性识别（底边布局不适用）；D100 按百分位骰（00～90）读取，未自动组合个位骰。</p>
+      D4 采用顶角重复数字一致性识别（底边布局不适用）；D100 按百分位骰（00～90）读取，未自动组合个位骰。
+      <b>D10 + D100 混合画面</b>请把 D100 单独放在一侧、形成明显间隔；系统按"少颗 = D100"自动归类，或手动选型。
+      勾选"百炼 VLM 兜底"后两位数/顶角布局失败的骰子会走云端读数。</p>
     <label>画面内骰型（混合骰请选自动）
       <select id="diceType">
         <option value="unknown">自动 / 未知</option>
         <option value="d4">D4 顶角</option><option value="d6">D6</option>
-        <option value="d8">D8</option><option value="d10">D10</option>
-        <option value="d12">D12</option><option value="d20">D20</option>
+        <option value="d8">D8</option>
+        <option value="d10">D10</option>
+        <option value="d12">D12</option>
+        <option value="d20">D20</option>
         <option value="d100">D100 百分位</option>
+      </select>
+    </label>
+    <label class="detector-label" title="选择检测后端;经典 CV 无需模型,ONNX/YOLO 加载权重">
+      检测后端
+      <select id="detectorSel">
+        <option value="cv">CV (经典 OpenCV 轮廓)</option>
+        <option value="onnx">ONNX (G-G-Games 三模型 · GPU 加速)</option>
+        <option value="yolo">YOLO (.pt 自训权重)</option>
+        <option value="auto">自动 (有 onnx 用 onnx,否则 yolo,否则 cv)</option>
+      </select>
+      <span class="detector-status" id="detectorStatus">检测中…</span>
+    </label>
+    <label class="detector-label" title="本地识别不出时,用阿里百炼云端 VLM 自动兜底(并发起,不阻塞本地)">
+      百炼 VLM 兜底
+      <input type="checkbox" id="vlmEnable" />
+      <select id="vlmModel">
+        <option value="qwen3-vl-flash">qwen3-vl-flash (快 · 默认)</option>
+        <option value="qwen3-vl-plus">qwen3-vl-plus (更准)</option>
+        <option value="qwen3-vl-max">qwen3-vl-max (旗舰)</option>
+        <option value="qwen-vl-ocr">qwen-vl-ocr (老 OCR)</option>
       </select>
     </label>
     <section class="workbench">
@@ -87,6 +111,19 @@
         <div class="actions">
           <button id="btnCamStart" class="btn-primary">▶ 开始识别</button>
           <button id="btnCamStop" class="btn-ghost" disabled>■ 停止</button>
+          <label class="cam-fps-label" title="选择输入设备;海康 DS-UVC-S224A 等 UVC 摄像头会自动列出">
+            摄像头
+            <select id="camDevice">
+              <option value="">加载中…</option>
+            </select>
+          </label>
+          <label class="cam-fps-label">取帧清晰度（开始前设置）
+            <select id="camResolution">
+              <option value="1280">720p</option>
+              <option value="1920">1080p</option>
+              <option value="2560" selected>1440p（设备支持时）</option>
+            </select>
+          </label>
           <label class="cam-fps-label">
             目标帧率
             <select id="camInterval">

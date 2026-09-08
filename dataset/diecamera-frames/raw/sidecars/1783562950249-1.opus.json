@@ -1,0 +1,32 @@
+{
+  "model": "claude-sonnet-5",
+  "labels": [
+    {
+      "type": "d20",
+      "value": 4,
+      "confidence": 0.4,
+      "box": {
+        "x": 0.73,
+        "y": 0,
+        "w": 0.22,
+        "h": 0.2
+      }
+    },
+    {
+      "type": "d20",
+      "value": 12,
+      "confidence": 0.4,
+      "box": {
+        "x": 0,
+        "y": 0.53,
+        "w": 0.17,
+        "h": 0.2
+      }
+    }
+  ],
+  "warnings": [
+    "Blue d20 is angled with multiple numbers visible (14, 4, 18, 11, 13); top face likely 4 but uncertain due to tilt.",
+    "Pink d20 is angled with multiple numbers visible (12, 13, 10); top face likely 12 but uncertain due to tilt.",
+    "Both dice appear tilted against the tray wall rather than lying flat, reducing confidence in the reading."
+  ]
+}

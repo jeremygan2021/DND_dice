@@ -1,0 +1,32 @@
+{
+  "model": "claude-sonnet-5",
+  "labels": [
+    {
+      "type": "d20",
+      "value": 6,
+      "confidence": 0.55,
+      "box": {
+        "x": 0.04,
+        "y": 0.47,
+        "w": 0.18,
+        "h": 0.19
+      }
+    },
+    {
+      "type": "d20",
+      "value": 11,
+      "confidence": 0.5,
+      "box": {
+        "x": 0,
+        "y": 0.62,
+        "w": 0.17,
+        "h": 0.19
+      }
+    }
+  ],
+  "warnings": [
+    "Pink d20 top face partially obscured; value could be 6 or 9 depending on orientation mark, confidence lowered.",
+    "Black d20 is partly cropped off the left edge of the image and leaning against the pink die, making the top face uncertain; value could be 11 or another nearby number.",
+    "Both dice are touching/overlapping each other, which may affect which face is truly 'up'."
+  ]
+}

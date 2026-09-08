@@ -1,0 +1,74 @@
+{
+  "model": "champion:dice-shape",
+  "labels": [
+    {
+      "type": "d4",
+      "value": 1,
+      "confidence": 0.8752559488233658,
+      "box": {
+        "x": 0.1592,
+        "y": 0.7734,
+        "w": 0.1448,
+        "h": 0.1576
+      }
+    },
+    {
+      "type": "d20",
+      "value": 1,
+      "confidence": 0.8368286267889005,
+      "box": {
+        "x": 0.245,
+        "y": 0.3081,
+        "w": 0.1803,
+        "h": 0.1793
+      }
+    },
+    {
+      "type": "d10",
+      "value": 1,
+      "confidence": 0.832428936245293,
+      "box": {
+        "x": 0.4722,
+        "y": 0.0279,
+        "w": 0.1681,
+        "h": 0.1914
+      }
+    },
+    {
+      "type": "d8",
+      "value": 1,
+      "confidence": 0.8193662450507659,
+      "box": {
+        "x": 0.7889,
+        "y": 0.0898,
+        "w": 0.1531,
+        "h": 0.164
+      }
+    },
+    {
+      "type": "d6",
+      "value": 1,
+      "confidence": 0.818176186975279,
+      "box": {
+        "x": 0.572,
+        "y": 0.642,
+        "w": 0.1278,
+        "h": 0.1417
+      }
+    },
+    {
+      "type": "d6",
+      "value": 1,
+      "confidence": 0.8045472298883283,
+      "box": {
+        "x": 0.3767,
+        "y": 0.8093,
+        "w": 0.1332,
+        "h": 0.1556
+      }
+    }
+  ],
+  "warnings": [
+    "local shape model: dice typed and boxed — click each die and set its rolled value"
+  ]
+}

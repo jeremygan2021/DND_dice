@@ -1,0 +1,30 @@
+{
+  "model": "champion:dice-shape",
+  "labels": [
+    {
+      "type": "d12",
+      "value": 1,
+      "confidence": 0.9045218315987924,
+      "box": {
+        "x": 0.6287,
+        "y": 0.138,
+        "w": 0.165,
+        "h": 0.1709
+      }
+    },
+    {
+      "type": "d20",
+      "value": 1,
+      "confidence": 0.8088038920113689,
+      "box": {
+        "x": 0.7433,
+        "y": 0.6904,
+        "w": 0.1793,
+        "h": 0.1748
+      }
+    }
+  ],
+  "warnings": [
+    "local shape model: dice typed and boxed — click each die and set its rolled value"
+  ]
+}

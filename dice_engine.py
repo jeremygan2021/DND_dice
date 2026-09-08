@@ -31,7 +31,8 @@ STILL_MOVE_PX = 5.0            # bbox 中心位移(原图像素)低于此且 ROI
 MIN_STILL_FRAMES = 4           # 连续静止多少帧判 settled
 TRACK_PURGE_S = 1.5            # 跟踪对象连续多少秒没被匹配就删除
 TRACK_PURGE_MISS = 4           # 或连续丢失这么多帧(≈0.5s)直接删
-OCR_COOLDOWN_S = 1.5           # 同 track 两次 OCR 最小间隔
+OCR_COOLDOWN_S = 0.6           # 同 track 两次 OCR 最小间隔(onnx 路径下从 1.5 调到 0.6)
+VLM_COOLDOWN_S = 2.0           # 同一颗骰子两次 VLM 兜底最小间隔(防止云端被打爆)
 OCR_MAX_FAILS = 5              # 连续失败这么多次后暂停,等骰子再动恢复
 ROI_FP_CHANGE = 12.0           # 已识别 track 的 ROI 指纹差超过此 → 判定骰子被换/翻面
 EMA_ALPHA = 0.55               # bbox EMA 平滑系数
@@ -200,6 +201,62 @@ def _roi_diff(fp_a: Optional[np.ndarray], fp_b: Optional[np.ndarray]) -> float:
 
 
 # ----------------------------------------------------------------------
+# 位置分桶:少颗 = D100, 多颗 = D10
+# ----------------------------------------------------------------------
+def bucket_unknown_by_position(detections: List[dict]) -> None:
+    """Mutate detections in-place: leave typed ones alone; for unknown detections,
+    split by bbox-centre X into two clusters via the largest gap, then mark the
+    smaller cluster as d100 and the larger as d10.
+
+    Convention: the user puts D100 on the left and D10 on the right (so the
+    D10 cluster is the larger group when a single D100 sits next to several D10s).
+    If only one side exists, all unknown stay unknown (the user must pick the
+    type manually in that case).
+    """
+    unknown_idx = [i for i, d in enumerate(detections) if d.get("dice_type") == "unknown"]
+    if len(unknown_idx) < 2:
+        return
+    centres_x = sorted((_center(d["bbox"])[0] for d in detections if d.get("dice_type") == "unknown"))
+    if len(centres_x) < 2:
+        return
+    # Largest-gap split: every adjacent pair (centres_x[i], centres_x[i+1]) has a
+    # gap; the cut is placed at the largest one. This is more robust than 2-means
+    # for typical desk shots where one D100 sits beside a tight pack of D10s.
+    best_gap = -1.0
+    best_k = 1
+    for k in range(1, len(centres_x)):
+        gap = centres_x[k] - centres_x[k - 1]
+        if gap > best_gap:
+            best_gap = gap
+            best_k = k
+    # Require a meaningful gap (≥ 1/4 of median die width). Below that, all dice
+    # are essentially in one row and we cannot tell which side is which.
+    spans = []
+    for i in unknown_idx:
+        x1, _, x2, _ = detections[i]["bbox"]
+        spans.append(x2 - x1)
+    median_w = sorted(spans)[len(spans) // 2]
+    if best_gap < max(12.0, median_w * 0.5):
+        return
+    threshold = (centres_x[best_k - 1] + centres_x[best_k]) / 2.0
+    left = [i for i in unknown_idx if _center(detections[i]["bbox"])[0] <= threshold]
+    right = [i for i in unknown_idx if _center(detections[i]["bbox"])[0] > threshold]
+    if not left or not right:
+        return
+    # Smaller cluster → D100, larger → D10. Tie break: prefer the left cluster.
+    if len(left) <= len(right):
+        d100_ids, d10_ids = left, right
+    else:
+        d100_ids, d10_ids = right, left
+    for i in d100_ids:
+        detections[i]["dice_type"] = "d100"
+        detections[i]["position_assigned"] = True
+    for i in d10_ids:
+        detections[i]["dice_type"] = "d10"
+        detections[i]["position_assigned"] = True
+
+
+# ----------------------------------------------------------------------
 # 阶段 B:顶面梯形校正 + 二值化 + OCR
 # ----------------------------------------------------------------------
 def _upscale(base: np.ndarray, target: int = 340, min_s: float = 1.0,
@@ -293,7 +350,10 @@ class FaceOCR:
                 attr = '_api_executor' if api else '_executor'
                 pool = getattr(self, attr)
                 if pool is None:
-                    pool = ThreadPoolExecutor(max_workers=2 if api else 1,
+                    # onnx 三模型 OCR 很快(~30ms/颗);R paddleOCR 较慢(~150ms)。
+                    # 并发跑 6 worker + 16 slot, 5 颗骰子能同帧发起、几乎同时完成
+                    workers = 6 if api else 6
+                    pool = ThreadPoolExecutor(max_workers=workers,
                                               thread_name_prefix='dice-api' if api else 'dice-ocr')
                     setattr(self, attr, pool)
                 future = pool.submit(fn, *args, **kw)
@@ -309,8 +369,28 @@ class FaceOCR:
     def submit_api(self, fn, *args, **kw):
         return self._submit(True, fn, *args, **kw)
 
+    def read_frame_die(self, image, bbox, dice_type, backend):
+        result = dict(value=None, conf=0., text="", source="local", reason=None, glyph_bbox=None)
+        if backend == "onnx" and dice_type != "d100":
+            from dice_onnx_engine import engine
+            result = engine.read_die(image, bbox, dice_type)
+            if result['value'] is not None or result['reason'] == 'model_disagreement':
+                return result
+        h,w = image.shape[:2]
+        x,y,xx,yy = bbox
+        crop = image[max(0,y-10):min(h,yy+10),max(0,x-10):min(w,xx+10)]
+        v,c,t = self.read_crop(crop, dice_type)
+        if v is not None:
+            result.update(value=v, conf=c, text=t, source="local", reason=None)
+        elif result['reason'] is None:
+            result['reason'] = 'ocr_uncertain'
+        result['face_pixels'] = min(xx-x,yy-y)
+        return result
+
     def read_crop(self, crop_bgr: np.ndarray, dice_type="unknown") -> Tuple[Optional[int], float, str]:
         # Apex-numbered D4: require the repeated apex value on multiple visible faces.
+        if dice_type == "d100":
+            return self._read_crop_d100(crop_bgr)
         votes = {}
         with self._lock:
             reader = self._ensure()
@@ -356,6 +436,88 @@ class FaceOCR:
                 return v, score/count, norm
         return None, 0.0, ""
 
+    def _read_crop_d100(self, crop_bgr: np.ndarray) -> Tuple[Optional[int], float, str]:
+        """Percentile D100: top face is a two-digit multiple of 10 (00,10..90).
+
+        RapidOCR's DBNet detector tends to split "70" into two single-digit boxes.
+        We rebuild two-digit strings from left-to-right digit pairs when:
+          - both digits sit at roughly the same y-band (single line, not stacked),
+          - the right digit is to the right of the left digit,
+          - each digit independently passes text_to_value("0".."9").
+
+        A single recognized two-digit string from rec also passes through.
+        """
+        pair_votes: Dict[str, List[float]] = {}
+        single_digit_votes: Dict[str, List[float]] = {}
+        with self._lock:
+            reader = self._ensure()
+            for cand in _ocr_candidates(crop_bgr)[:MAX_OCR_CANDS]:
+                try:
+                    res, _ = reader(cand)
+                except Exception as e:
+                    log.debug("OCR candidate error: %r", e)
+                    continue
+                if not res:
+                    continue
+                ch, cw = cand.shape[:2]
+                accepted = []
+                for item in res:
+                    if len(item) < 3:
+                        continue
+                    raw = str(item[1]).strip()
+                    confidence = float(item[2])
+                    if confidence < .55:
+                        continue
+                    pts = np.asarray(item[0], dtype=float).reshape(-1, 2)
+                    x1, y1 = pts.min(axis=0); x2, y2 = pts.max(axis=0)
+                    accepted.append((raw, confidence, (x1, y1, x2, y2)))
+                # 1) Direct two-digit text from the recognizer
+                for raw, conf, _ in accepted:
+                    norm = _norm_text(raw)
+                    if len(norm) == 2 and norm[0].isdigit() and norm[1].isdigit():
+                        v = int(norm)
+                        if v % 10 == 0 and 0 <= v <= 90:
+                            pair_votes.setdefault(norm, []).append(conf)
+                # 2) Pair two single-digit boxes when they form one row of digits
+                digits = []
+                for raw, conf, box in accepted:
+                    norm = _norm_text(raw)
+                    if len(norm) == 1 and norm.isdigit():
+                        digits.append((norm, conf, box))
+                if len(digits) >= 2:
+                    digits.sort(key=lambda d: d[2][0])  # left→right
+                    # Only keep adjacent pairs whose y-bands overlap significantly
+                    for i in range(len(digits) - 1):
+                        ld, lc, lb = digits[i]
+                        rd, rc, rb = digits[i + 1]
+                        lh = max(1.0, lb[3] - lb[1])
+                        rh = max(1.0, rb[3] - rb[1])
+                        y_overlap = min(lb[3], rb[3]) - max(lb[1], rb[1])
+                        # Require row alignment (≥ 60% of average height overlap)
+                        # and a horizontal gap smaller than one digit width
+                        if y_overlap / max(lh, rh) < .6:
+                            continue
+                        lw = lb[2] - lb[0]
+                        if rb[0] - lb[2] > max(lw, rb[2] - rb[0]) * 1.6:
+                            continue
+                        pair = ld + rd
+                        v = int(pair)
+                        if v % 10 != 0 or v > 90:
+                            continue
+                        # Weight by min of two confidences: the weaker digit gates the pair
+                        pair_votes.setdefault(pair, []).append(min(lc, rc))
+                # 3) Track single digits too, in case all candidate images split the box
+                for raw, conf, _ in accepted:
+                    norm = _norm_text(raw)
+                    if len(norm) == 1 and norm.isdigit():
+                        single_digit_votes.setdefault(norm, []).append(conf)
+        if pair_votes:
+            best = max(pair_votes.items(), key=lambda kv: (sum(kv[1]) / len(kv[1]), len(kv[1])))
+            pair, confs = best
+            return int(pair), float(sum(confs) / len(confs)), pair
+        # No two-digit result: refuse to guess a single zero as 100.
+        return None, 0.0, ""
+
 
 # ----------------------------------------------------------------------
 # 跟踪单元
@@ -375,6 +537,7 @@ class Track:
     text: str = ""
     conf: float = 0.0
     source: str = "local"
+    reason: Optional[str] = None
     ocr_ts: float = 0.0
     ocr_pending: bool = False
     ocr_fails: int = 0                 # 连续失败次数(退避用)
@@ -385,6 +548,12 @@ class Track:
     miss_frames: int = 0                    # 连续未被匹配的帧数
     gen: int = 0                            # 每次运动/换面 +1,作废在途 OCR 结果
     ocr_gave_up: bool = False               # 连续失败多次后暂停,等骰子再动才恢复
+    # —— 云端 VLM 兜底状态 ——
+    vlm_pending: bool = False               # 云端 VLM 还在调用
+    vlm_ts: float = 0.0                     # 上次发起 VLM 的时间戳(冷却用)
+    vlm_value: Optional[int] = None         # VLM 原始解析值(可能越界被拒)
+    vlm_text: str = ""                      # VLM 原始返回文本
+    vlm_model: str = ""                     # 实际使用的模型名(调试用)
 
     @property
     def state(self) -> str:
@@ -469,7 +638,10 @@ class DiceSession:
         self._detections = []
         self._prev_full: Optional[Tuple[int, int]] = None
         self.expected_type = "unknown"
-        self.api_mode: bool = False   # True: 稳定后的 OCR 走百炼 qwen-vl-ocr
+        self.backend = None
+        self.api_mode: bool = False   # 兼容: 完全用云端 OCR 走百炼 (旧行为)
+        self.vlm_mode: bool = False   # 新: onnx + 云端 VLM 并行,onnx 失败时 VLM 兜底
+        self.vlm_model: str = "qwen3-vl-flash"  # 云端 VLM 模型名
 
     # ------------------------------------------------------------------
     def _update_tracks(self, boxes, img_bgr, ts):
@@ -564,11 +736,16 @@ class DiceSession:
     # ------------------------------------------------------------------
     def _reset_value(self, tr: Track):
         tr.value, tr.text, tr.conf = None, "", 0.0
+        tr.reason = None
         tr.settled = False
         tr.stable_frames = 0
         tr.ref_fp = None
         tr.ocr_fails = 0
         tr.ocr_gave_up = False
+        tr.vlm_pending = False
+        tr.vlm_ts = 0.0
+        tr.vlm_value = None
+        tr.vlm_text = ""
         tr.gen += 1   # 换面/值重置 → 作废在途 OCR
 
     # ------------------------------------------------------------------
@@ -594,14 +771,23 @@ class DiceSession:
         tid = tr.track_id
         sid = self.sid
         use_api = self.api_mode
+        vlm_mode = self.vlm_mode and not use_api    # use_api 已经全走云端,不必再并发
+        vlm_model = self.vlm_model
         gen_at_submit = tr.gen
         dice_type = tr.dice_type
+        backend = self.backend or "cv"
+        frame = img_bgr.copy() if backend == "onnx" else None
+        box_at_submit = list(tr.box)
 
         def _job():
+            details = {}
             try:
                 if use_api and dice_type != "d4":
-                    v, conf, text = _ocr_per_die_api(crop)
+                    v, conf, text = _ocr_per_die_api(crop, model=vlm_model, dice_type=dice_type)
                     v, text = text_to_value(text, dice_type)
+                elif backend == "onnx":
+                    details = self.ocr.read_frame_die(frame, box_at_submit, dice_type, backend)
+                    v, conf, text = details["value"], details["conf"], details["text"]
                 else:
                     v, conf, text = self.ocr.read_crop(crop, dice_type)
             except Exception:
@@ -612,21 +798,31 @@ class DiceSession:
                 if tr is None:
                     return
                 tr.ocr_pending = False
+                if tr.gen == gen_at_submit:
+                    tr.reason = details.get("reason")
                 if v is None:
-                    # 没读到 → 等冷却后重试;连败多轮则放弃直到骰子再动
-                    if tr.settled and tr.gen == gen_at_submit:
-                        tr.ocr_fails += 1
-                        if tr.ocr_fails >= OCR_MAX_FAILS:
-                            tr.ocr_gave_up = True
-                            log.debug("sid=%s track %d OCR give up after %d fails",
-                                      sid, tid, tr.ocr_fails)
+                    # 本地 OCR 失败 → 立刻发起 VLM 兜底(不等冷却,云端本来慢)
+                    if vlm_mode and dice_type != "d4" and not tr.vlm_pending \
+                            and ts - tr.vlm_ts > VLM_COOLDOWN_S \
+                            and tr.gen == gen_at_submit:
+                        self._kick_vlm(tr, crop, dice_type, vlm_model, gen_at_submit, ts)
+                    else:
+                        # 没读到 → 等冷却后重试;连败多轮则放弃直到骰子再动
+                        if tr.settled and tr.gen == gen_at_submit:
+                            tr.ocr_fails += 1
+                            if tr.ocr_fails >= OCR_MAX_FAILS:
+                                tr.ocr_gave_up = True
+                                log.debug("sid=%s track %d OCR give up after %d fails",
+                                          sid, tid, tr.ocr_fails)
                     return
                 # OCR 期间骰子动过(gen 变)或已不处于稳定 → 丢弃过期结果
                 if not tr.settled or tr.gen != gen_at_submit:
                     return
                 tr.value, tr.conf, tr.text = v, conf, text
-                tr.source = "api" if use_api and dice_type != "d4" else "local"
+                tr.source = "api" if use_api and dice_type != "d4" else details.get("source", "local")
                 tr.ocr_fails = 0
+                # 本地出值 → 取消在飞的 VLM
+                tr.vlm_pending = False
                 log.debug("sid=%s track %d OCR(%s) ok: value=%s conf=%.2f",
                           sid, tid, tr.source, v, conf)
 
@@ -635,17 +831,79 @@ class DiceSession:
             tr.ocr_pending = False
 
     # ------------------------------------------------------------------
-    def process_frame(self, img_bgr: np.ndarray, dice_type="unknown", use_api=False) -> Dict:
+    def _kick_vlm(self, tr: Track, crop_bgr: np.ndarray, dice_type: str,
+                  model: str, gen_at_submit: int, ts: float):
+        """发起云端 VLM 兜底任务。与 onnx 并行不阻塞,仅在 onnx 失败时被采纳。"""
+        tr.vlm_pending = True
+        tr.vlm_ts = ts
+        crop_copy = np.ascontiguousarray(crop_bgr).copy()
+        tid = tr.track_id
+        sid = self.sid
+
+        def _vlm_job():
+            try:
+                v_raw, conf, raw_text = _ocr_per_die_api(crop_copy, model=model, timeout=20,
+                                                         dice_type=dice_type)
+            except Exception:
+                log.exception("VLM failed")
+                v_raw, conf, raw_text = None, 0.0, ""
+            with self._write_lock:
+                tr = self.tracks.get(tid)
+                if tr is None:
+                    return
+                tr.vlm_pending = False
+                # 始终记录 VLM 原始返回(给前端透明展示,即使越界被拒)
+                tr.vlm_text = raw_text or ""
+                tr.vlm_model = model
+                if v_raw is not None:
+                    tr.vlm_value = v_raw  # 解析出的整数(可能越界)
+                # 仅当 onnx 仍失败 且 gen 一致 且仍在 settled → 采纳云端结果
+                if v_raw is None or tr.gen != gen_at_submit or not tr.settled:
+                    return
+                if tr.value is not None:
+                    # 本地已出值(可能并发完成)→ 不覆盖
+                    return
+                v_valid, text_valid = text_to_value(raw_text, dice_type)
+                if v_valid is None:
+                    return
+                tr.value, tr.conf, tr.text = v_valid, conf, text_valid
+                tr.source = "vlm"
+                tr.reason = None
+                log.debug("sid=%s track %d VLM(%s) ok: value=%s (raw=%r)",
+                          sid, tid, model, v_valid, raw_text)
+
+        # 用 api pool (worker=6);若无 slot,降级:设回 pending=False,等下帧
+        future = self.ocr.submit_api(_vlm_job)
+        if future is None:
+            tr.vlm_pending = False
+
+    # ------------------------------------------------------------------
+    def process_frame(self, img_bgr: np.ndarray, dice_type="unknown",
+                      use_api: bool = False, vlm: bool = False,
+                      vlm_model: str = "qwen3-vl-flash") -> Dict:
         with self._frame_lock, self._write_lock:
-            if dice_type != self.expected_type or use_api != self.api_mode:
+            # 模式切换 → 清缓存
+            need_reset = (dice_type != self.expected_type
+                          or use_api != self.api_mode
+                          or vlm != self.vlm_mode
+                          or vlm_model != self.vlm_model)
+            if need_reset:
                 for tr in self.tracks.values():
                     self._reset_value(tr)
             self.expected_type = dice_type
             self.api_mode = use_api
+            self.vlm_mode = vlm
+            self.vlm_model = vlm_model
             return self._process_frame(img_bgr)
 
     def _process_frame(self, img_bgr: np.ndarray) -> Dict:
         """处理一帧。返回轻量响应 dict(bbox + 状态 + 缓存值)。"""
+        active_backend = detector.backend
+        if self.backend != active_backend:
+            self.tracks.clear()
+            self.prev_boxes = []
+            self._detections = []
+        self.backend = active_backend
         ts = time.time()
         self.last_access = ts
         self.frame_count += 1
@@ -672,6 +930,10 @@ class DiceSession:
         else:
             t1 = time.perf_counter()
             self._detections = detector.detect(img_bgr, fast=True)
+            # Position-based split for unknown dice: smaller cluster → d100,
+            # larger cluster → d10. Only when the user has NOT pinned a type.
+            if self.expected_type == "unknown":
+                bucket_unknown_by_position(self._detections)
             boxes = [d["bbox"] for d in self._detections]
             self._last_detection = ts
             det_ms = (time.perf_counter() - t1) * 1000
@@ -689,12 +951,17 @@ class DiceSession:
             d = {
                 "track_id": tr.track_id,
                 "dice_type": tr.dice_type,
+                "reason": tr.reason,
                 "bbox": [int(v) for v in tr.box],
                 "value": tr.value,
                 "text": tr.text,
                 "conf": round(tr.conf, 3),
                 "state": tr.state,
                 "ocr_pending": tr.ocr_pending,
+                "vlm_pending": tr.vlm_pending,
+                "vlm_value": tr.vlm_value,
+                "vlm_text": tr.vlm_text,
+                "vlm_model": tr.vlm_model,
                 "ocr_gave_up": tr.ocr_gave_up,
                 "source": tr.source if tr.value is not None else None,
             }
@@ -766,33 +1033,58 @@ registry = DiceSessionRegistry()
 # ----------------------------------------------------------------------
 def analyze_image(img_bgr: np.ndarray,
                   use_api: bool = False,
-                  per_die_api: bool = False, dice_type: str = "unknown") -> Tuple[np.ndarray, List[Dict]]:
+                  per_die_api: bool = False,
+                  dice_type: str = "unknown",
+                  vlm: bool = False,
+                  vlm_model: str = "qwen3-vl-flash") -> Tuple[np.ndarray, List[Dict]]:
     """上传单张图完整识别。返回 (annotated_bgr, dice_info)。
-    dice_info: [{bbox, value, text, conf, source}]
+    dice_info: [{bbox, value, text, conf, source, ...}]
+
+    vlm=True: 本地 onnx 失败时,自动用云端 VLM 串行兜底。
+    摄像头模式才是并行兜底(DiceSession._kick_vlm),上传是一次性任务,串行足够。
     """
     expected_type = dice_type
     detections = detector.detect(img_bgr, fast=False)
+    # Position-based split for unknown dice: smaller cluster → d100,
+    # larger cluster → d10. Only when the user has NOT pinned a type.
+    if expected_type == "unknown":
+        bucket_unknown_by_position(detections)
     detections.sort(key=lambda d: (d["bbox"][1], d["bbox"][0]))
 
     dice_info: List[Dict] = []
     h, w = img_bgr.shape[:2]
+    backend = detector.backend
     for detection in detections:
         box = detection["bbox"]
-        dice_type = expected_type if expected_type != "unknown" else detection["dice_type"]
+        dtype_ = expected_type if expected_type != "unknown" else detection["dice_type"]
         x1, y1, x2, y2 = box
         pad = 10
         xa, ya = max(0, x1 - pad), max(0, y1 - pad)
         xb, yb = min(w, x2 + pad), min(h, y2 + pad)
         crop = img_bgr[ya:yb, xa:xb]
-        if use_api and per_die_api and dice_type != "d4":
-            v, conf, text = _ocr_per_die_api(crop)
-            v, text = text_to_value(text, dice_type)
+        details = {}
+        v = conf = text = None
+        src = "local"
+        if use_api and per_die_api and dtype_ != "d4":
+            v, conf, text = _ocr_per_die_api(crop, model=vlm_model, dice_type=dtype_)
+            v, text = text_to_value(text, dtype_)
             src = "api"
         else:
-            v, conf, text = registry.read_crop_sync(crop, dice_type)
-            src = "local"
+            details = registry._ocr.read_frame_die(img_bgr, box, dtype_, backend)
+            v, conf, text = details["value"], details["conf"], details["text"]
+            src = details["source"]
+
+        # 本地失败 → 云端 VLM 兜底(对 D100 也启用;VLM prompt 会切到两位数专用)
+        if v is None and vlm and not (use_api and per_die_api):
+            vv, cc, tt = _ocr_per_die_api(crop, model=vlm_model, timeout=20, dice_type=dtype_)
+            vv, tt = text_to_value(tt, dtype_)
+            if vv is not None:
+                v, conf, text, src = vv, cc, tt, "vlm"
+                details["reason"] = None
+
         dice_info.append({"bbox": box, "value": v, "text": text,
-                          "dice_type": dice_type, "detection_conf": detection["confidence"],
+                          "dice_type": dtype_, "detection_conf": detection["confidence"],
+                          "reason": details.get("reason"), "glyph_bbox": details.get("glyph_bbox"),
                           "conf": round(conf, 3), "source": src})
 
     annotated = _draw_boxes(img_bgr, dice_info)
@@ -817,8 +1109,17 @@ def _draw_boxes(img_bgr: np.ndarray, dice_info: List[Dict]) -> np.ndarray:
     return out
 
 
-def _ocr_per_die_api(crop_bgr: np.ndarray):
-    """单颗骰子裁图走百炼 qwen-vl-ocr(可选,最准最慢)。"""
+def _ocr_per_die_api(crop_bgr: np.ndarray, model: str = "qwen3-vl-flash", timeout: int = 20,
+                     dice_type: str = "unknown"):
+    """单颗骰子裁图走百炼视觉大模型(可选,兜底最慢)。
+
+    默认 model=qwen3-vl-flash(快、便宜、命中率高);
+    想要更准可选 qwen3-vl-plus; 保留 qwen-vl-ocr (老 OCR 专用) 兼容老调用。
+    返回 (value, conf, raw_text) — conf 这里固定 1.0(云端置信度视为权威)。
+
+    dice_type 用于切换 prompt:D4/D100 需要特殊指令(VLM 默认只回答"数字"会漏位),
+    普通 D6/D8/D10/D12/D20 沿用单字 prompt。
+    """
     import subprocess, tempfile, os
     ch, cw = crop_bgr.shape[:2]
     scale = max(1.5, 240 / max(ch, cw))
@@ -827,20 +1128,67 @@ def _ocr_per_die_api(crop_bgr: np.ndarray):
     tmp = tempfile.NamedTemporaryFile(suffix=".png", delete=False)
     try:
         cv2.imwrite(tmp.name, crop_big)
+        prompt = _vlm_prompt(model, dice_type)
         proc = subprocess.run(
             ["bl", "vision", "describe",
              "--image", tmp.name,
-             "--prompt", "图中最显眼的数字(骰子顶面),只输出那个数字本身,不要任何解释。",
-             "--model", "qwen-vl-ocr"],
-            capture_output=True, text=True, timeout=30,
+             "--prompt", prompt,
+             "--model", model,
+             "--timeout", str(timeout)],
+            capture_output=True, text=True, timeout=timeout + 5,
         )
         text = (proc.stdout or "").strip()
+        if proc.returncode != 0 and not text:
+            log.warning("VLM %s failed: %s", model, (proc.stderr or "")[:200])
+    except subprocess.TimeoutExpired:
+        log.warning("VLM %s timeout after %ds", model, timeout)
+        text = ""
+    except Exception as e:
+        log.warning("VLM %s error: %r", e)
+        text = ""
     finally:
         try:
             os.unlink(tmp.name)
         except OSError:
             pass
-    v, norm = text_to_value(text)
+    # Try strict parsing first; if the model added explanation, fall back to
+    # grabbing the first numeric token that fits the dice-type value range.
+    v, norm = text_to_value(text, dice_type)
     if v is not None:
         return v, 1.0, norm
-    return None, 0.0, ""
+    m = re.search(r"\d{1,2}", text)
+    if m:
+        v, norm = text_to_value(m.group(0), dice_type)
+        if v is not None:
+            log.debug("VLM %s noisy reply %r, salvaged %s", model, text[:80], norm)
+            return v, 0.9, norm
+    return None, 0.0, text
+
+
+def _vlm_prompt(model: str, dice_type: str) -> str:
+    """为不同骰型返回最合适的 VLM prompt。
+
+    普通骰只让云端回答"一个数字",但 D100 的两位数和 D4 的三面顶角
+    在默认 prompt 下会被裁剪成单个字符返回,会丢精度。
+    """
+    if model == "qwen-vl-ocr":
+        return "图中最显眼的数字(骰子顶面),只输出那个数字本身,不要任何解释。"
+    if dice_type == "d100":
+        return (
+            "This is a percentile D10 (D100) die. The top face shows a two-digit "
+            "multiple of 10 (00, 10, 20, 30, 40, 50, 60, 70, 80, or 90). "
+            "Reply with ONLY that two-digit number, no other text."
+        )
+    if dice_type == "d4":
+        return (
+            "This is a tetrahedral D4 die. Three faces are visible. Each face "
+            "has a number printed near a corner, and the value on the TOP face "
+            "equals the SUM of the three visible corner numbers. Read the three "
+            "corner numbers, sum them, and reply with ONLY the resulting digit "
+            "1-4. No other text, no explanation, no formatting."
+        )
+    return (
+        "Reply with ONLY the digit shown on the top face of the die, "
+        "with no other text, punctuation, or explanation. "
+        "Output a single digit between 0 and 9."
+    )

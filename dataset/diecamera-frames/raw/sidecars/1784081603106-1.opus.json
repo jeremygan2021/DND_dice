@@ -1,0 +1,52 @@
+{
+  "model": "champion:dice-shape",
+  "labels": [
+    {
+      "type": "d20",
+      "value": 1,
+      "confidence": 0.8655345439910889,
+      "box": {
+        "x": 0.6788,
+        "y": 0.2433,
+        "w": 0.1893,
+        "h": 0.2212
+      }
+    },
+    {
+      "type": "d10",
+      "value": 1,
+      "confidence": 0.861193835735321,
+      "box": {
+        "x": 0.6468,
+        "y": 0.6519,
+        "w": 0.1774,
+        "h": 0.1884
+      }
+    },
+    {
+      "type": "d10",
+      "value": 1,
+      "confidence": 0.8396387100219727,
+      "box": {
+        "x": 0.7075,
+        "y": 0.003,
+        "w": 0.13,
+        "h": 0.1273
+      }
+    },
+    {
+      "type": "d10",
+      "value": 1,
+      "confidence": 0.8225346803665161,
+      "box": {
+        "x": 0.0378,
+        "y": 0.3417,
+        "w": 0.147,
+        "h": 0.1881
+      }
+    }
+  ],
+  "warnings": [
+    "local shape model: dice typed and boxed — click each die and set its rolled value"
+  ]
+}

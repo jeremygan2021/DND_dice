@@ -1,0 +1,64 @@
+{
+  "source": "/home/kali/dev/yolo/dataset/diecamera-frames",
+  "output": "/home/kali/dev/yolo/dataset/diecamera-detect",
+  "rows": 460,
+  "frames_used": 459,
+  "frames_skipped": 1,
+  "rig_to_split": {
+    "hue-hd-camera-0c45-6341": "val",
+    "hd-usb-camera-05a3-9520": "train",
+    "hd-usb-camera-05a3-9520-top-down": "train",
+    "android-webcam-18d1-4eed": "train",
+    "nintendo-switch-camera-057e-206d": "train",
+    "nintendo-switch-camera-057e-206d-top-down": "train",
+    "triveni-s-iphone-2-camera": "train",
+    "triveni-s-iphone-2-camera-top-down": "train",
+    "unknown-rig": "train"
+  },
+  "frames_per_rig": {
+    "android-webcam-18d1-4eed": 70,
+    "hd-usb-camera-05a3-9520-top-down": 35,
+    "hd-usb-camera-05a3-9520": 120,
+    "hue-hd-camera-0c45-6341": 104,
+    "nintendo-switch-camera-057e-206d-top-down": 11,
+    "nintendo-switch-camera-057e-206d": 8,
+    "triveni-s-iphone-2-camera-top-down": 27,
+    "triveni-s-iphone-2-camera": 19,
+    "unknown-rig": 65
+  },
+  "frames_per_split": {
+    "train": 355,
+    "val": 104
+  },
+  "boxes_per_class": {
+    "d4": 165,
+    "d20": 353,
+    "d10": 198,
+    "d8": 179,
+    "d12": 153,
+    "d6": 314,
+    "d100": 1
+  },
+  "boxes_per_split_class": {
+    "train": {
+      "d4": 133,
+      "d20": 270,
+      "d10": 132,
+      "d8": 131,
+      "d12": 109,
+      "d6": 254,
+      "d100": 1
+    },
+    "val": {
+      "d6": 60,
+      "d20": 83,
+      "d10": 66,
+      "d8": 48,
+      "d12": 44,
+      "d4": 32
+    }
+  },
+  "skipped_sample": [
+    "empty dice list: nintendo-switch-camera-057e-206d/2026-08-13/s1784143662850-0.jpg"
+  ]
+}

@@ -1,0 +1,30 @@
+{
+  "model": "champion:dice-shape",
+  "labels": [
+    {
+      "type": "d6",
+      "value": 1,
+      "confidence": 0.7385094165802002,
+      "box": {
+        "x": 0,
+        "y": 0.7526,
+        "w": 0.0651,
+        "h": 0.2474
+      }
+    },
+    {
+      "type": "d6",
+      "value": 1,
+      "confidence": 0.5288601517677307,
+      "box": {
+        "x": 0.0996,
+        "y": 0.3015,
+        "w": 0.1105,
+        "h": 0.2056
+      }
+    }
+  ],
+  "warnings": [
+    "local shape model: dice typed and boxed — click each die and set its rolled value"
+  ]
+}

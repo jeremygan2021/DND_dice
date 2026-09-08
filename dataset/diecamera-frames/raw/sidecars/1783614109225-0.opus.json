@@ -1,0 +1,65 @@
+{
+  "model": "claude-sonnet-5",
+  "labels": [
+    {
+      "type": "d10",
+      "value": 5,
+      "confidence": 0.8,
+      "box": {
+        "x": 0.34,
+        "y": 0.36,
+        "w": 0.16,
+        "h": 0.16
+      }
+    },
+    {
+      "type": "d20",
+      "value": 9,
+      "confidence": 0.55,
+      "box": {
+        "x": 0.49,
+        "y": 0.35,
+        "w": 0.22,
+        "h": 0.22
+      }
+    },
+    {
+      "type": "d6",
+      "value": 2,
+      "confidence": 0.9,
+      "box": {
+        "x": 0.44,
+        "y": 0.53,
+        "w": 0.15,
+        "h": 0.15
+      }
+    },
+    {
+      "type": "d10",
+      "value": 1,
+      "confidence": 0.7,
+      "box": {
+        "x": 0.24,
+        "y": 0.53,
+        "w": 0.18,
+        "h": 0.18
+      }
+    },
+    {
+      "type": "d12",
+      "value": 5,
+      "confidence": 0.6,
+      "box": {
+        "x": 0.4,
+        "y": 0.68,
+        "w": 0.22,
+        "h": 0.24
+      }
+    }
+  ],
+  "warnings": [
+    "A partially visible blue/dark die is occluded behind the pink d6 and black d12, not confidently readable.",
+    "d20 value could be 6 or 9 depending on orientation; underline not clearly visible.",
+    "d12 value could be 5 or 2 depending on orientation, low confidence due to angle."
+  ]
+}

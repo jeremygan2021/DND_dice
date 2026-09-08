@@ -1,0 +1,52 @@
+{
+  "schemaVersion": 1,
+  "id": "1784164831010-3",
+  "createdAt": "2026-07-16T01:20:31.011Z",
+  "model": "claude-sonnet-5",
+  "camera": "Nintendo Switch Camera (057e:206d)",
+  "image": "1784164831010-3.jpg",
+  "labels": [
+    {
+      "type": "d20",
+      "value": 15,
+      "confidence": 0.5,
+      "box": {
+        "x": 0.79,
+        "y": 0.83,
+        "w": 0.16,
+        "h": 0.16
+      },
+      "face": {
+        "poly": [
+          [
+            0.7837537932158035,
+            0.875155386515381
+          ],
+          [
+            0.8624289819569557,
+            0.8933242490077227
+          ],
+          [
+            0.8111247969426253,
+            0.9738291624850064
+          ]
+        ]
+      }
+    }
+  ],
+  "modelLabels": [
+    {
+      "type": "d20",
+      "value": 15,
+      "confidence": 0.5,
+      "box": {
+        "x": 0.79,
+        "y": 0.83,
+        "w": 0.16,
+        "h": 0.16
+      }
+    }
+  ],
+  "corrected": false,
+  "valuesTrusted": true
+}

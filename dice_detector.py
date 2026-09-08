@@ -1,5 +1,15 @@
-"""Optional trained seven-class YOLO detector. Never downloads generic weights."""
+"""Detector dispatcher:cv / ultralytics .pt / onnx 三选一。
+
+- cv  :纯 OpenCV 轮廓检测 (无 dice_type)
+- yolo :ultralytics + 自训 .pt (需 DICE_MODEL=...pt)
+- onnx :G-G-Games/diecamera-models 三模型管线 + CUDA 加速 (需要 models/diecamera-models/*.onnx)
+
+backend 由 DICE_DETECTOR=auto|cv|yolo|onnx 选定;运行时可通过 detector.set_mode() 切换。
+"""
 import os
+from contextvars import ContextVar
+
+request_detector_mode = ContextVar("request_detector_mode", default=None)
 import threading
 from pathlib import Path
 
@@ -31,27 +41,73 @@ def suppress(detections, threshold=0.45, limit=30):
 class DiceDetector:
     def __init__(self):
         self.path = Path(os.getenv('DICE_MODEL', str(Path(__file__).parent/'models/dice.pt')))
-        self.mode = os.getenv('DICE_DETECTOR', 'auto').lower()
-        if self.mode not in ('auto', 'cv', 'yolo'):
-            raise ValueError('DICE_DETECTOR must be auto, cv or yolo')
+        env_mode = os.getenv('DICE_DETECTOR', 'auto').lower()
+        if env_mode not in ('auto', 'cv', 'yolo', 'onnx'):
+            raise ValueError('DICE_DETECTOR must be auto, cv, yolo or onnx')
+        self._env_mode = env_mode
+        self._mode_override = None  # 运行时 set_mode() 设进来
         self.model = None
+        self.onnx_engine = None
         self.lock = threading.Lock()
         self.device = 'cpu'
+        self._cv_warning = 'CV 无法可靠区分骰型；需要七类骰子训练权重'
+
+    # ------------------------------------------------------------------
+    def set_mode(self, mode):
+        """运行时切换 backend (auto/cv/yolo/onnx)。'auto' 回到环境变量决定。"""
+        if mode not in ('auto', 'cv', 'yolo', 'onnx'):
+            raise ValueError('mode must be auto/cv/yolo/onnx')
+        with self.lock:
+            self._mode_override = None if mode == 'auto' else mode
+            # 切换后下次 detect() 会按新 backend 走
+
+    def _active_mode(self) -> str:
+        m = request_detector_mode.get() or self._mode_override or self._env_mode
+        if m == 'auto':
+            onnx_dir = Path(__file__).parent / 'models' / 'diecamera-models'
+            if (onnx_dir / 'dice-shape.onnx').exists():
+                return 'onnx'
+            if self.path.is_file():
+                return 'yolo'
+            return 'cv'
+        return m
 
     @property
     def backend(self):
-        return 'yolo' if self.mode == 'yolo' or (self.mode == 'auto' and self.path.is_file()) else 'cv'
+        return self._active_mode()
 
     def status(self):
-        return dict(backend=self.backend, weights_available=self.path.is_file(),
-                    loaded=self.model is not None, device=self.device,
-                    warning='CV 无法可靠区分骰型；需要七类骰子训练权重' if self.backend == 'cv' else None)
+        m = self.backend
+        info = dict(backend=m,
+                    yolo_weights_available=self.path.is_file(),
+                    onnx_available=(Path(__file__).parent/'models'/'diecamera-models'/'dice-shape.onnx').exists(),
+                    loaded=self.model is not None if m == 'yolo' else (self.onnx_engine is not None if m == 'onnx' else True),
+                    device=self.device,
+                    warning=self._cv_warning if m == 'cv' else ("ONNX 权重不含 D100；混合百分位骰需专门训练，或手动选 D100 使用 OCR" if m == "onnx" else None))
+        return info
 
     def detect(self, image, fast=True):
-        if self.backend == 'cv':
+        m = self._active_mode()
+        if m == 'cv':
             from dice_engine import detect_dice_boxes
             return [dict(bbox=b, dice_type='unknown', confidence=0.0)
-                    for b in detect_dice_boxes(image, fast)]
+                    for b in detect_dice_boxes(image, fast=False)]
+        if m == 'onnx':
+            return self._detect_onnx(image)
+        # yolo
+        return self._detect_yolo(image)
+
+    # ------------------------------------------------------------------
+    def _detect_onnx(self, image):
+        if self.onnx_engine is None:
+            from dice_onnx_engine import engine as _eng
+            self.onnx_engine = _eng
+            self.device = _eng.device
+        result = self.onnx_engine.detect_shapes(image)
+        self.device = self.onnx_engine.device
+        return result
+
+    def _detect_yolo(self, image):
         with self.lock:
             if self.model is None:
                 if not self.path.is_file():
@@ -76,3 +132,4 @@ class DiceDetector:
 
 
 detector = DiceDetector()
+

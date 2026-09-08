@@ -67,12 +67,23 @@ def index():
 
 @app.route("/healthz")
 def healthz():
+    onnx_status = {"available": False, "device": None}
+    try:
+        from dice_onnx_engine import engine as _onnx
+        onnx_status["available"] = _onnx.available
+        if _onnx._loaded:
+            onnx_status["device"] = _onnx.device
+            onnx_status["sessions"] = sorted(_onnx.sessions.keys())
+            onnx_status["providers"] = {k:s.get_providers() for k,s in _onnx.sessions.items()}
+    except Exception as e:
+        onnx_status["error"] = str(e)
     return jsonify({
         "status": "ok",
         "models": loader.status(),
         "device": loader.device,
         "hardware": capabilities(),
         "dice_detector": dice_engine.detector.status(),
+        "onnx_dice": onnx_status,
         "ocr_providers": dice_registry._ocr.providers,
     })
 
@@ -112,15 +123,34 @@ def _camera_response(img_bgr, res: dict, elapsed_ms: int):
     })
 
 
-def _handle_dice_camera(img_bgr, session_id: str, use_api: bool, dice_type="unknown"):
+def _handle_dice_camera(img_bgr, session_id: str, use_api: bool, dice_type="unknown",
+                       vlm: bool = False, vlm_model: str = "qwen3-vl-flash"):
     global _cleanup_counter
     session = dice_registry.get(session_id)
-    res = session.process_frame(img_bgr, dice_type, use_api)
+    res = session.process_frame(img_bgr, dice_type, use_api, vlm=vlm, vlm_model=vlm_model)
     # 每 60 个请求顺手清理一次空闲会话
     _cleanup_counter += 1
     if _cleanup_counter % 60 == 0:
         dice_registry.cleanup()
     return res
+
+
+class _DetectorModeCtx:
+    """上下文管理器:临时把全局 DiceDetector 切到指定 backend,退出时还原。"""
+
+    def __init__(self, mode: str):
+        self.mode = mode
+        self._prev = None
+
+    def __enter__(self):
+        from dice_detector import request_detector_mode
+        self._token = request_detector_mode.set(self.mode if self.mode != "auto" else None)
+        return self
+
+    def __exit__(self, exc_type, exc, tb):
+        from dice_detector import request_detector_mode
+        request_detector_mode.reset(self._token)
+        return False
 
 
 @app.route("/api/infer", methods=["POST"])
@@ -137,6 +167,16 @@ def api_infer():
     mode = request.form.get("mode", "upload").strip().lower()
     if mode not in ("upload", "camera"):
         return jsonify({"error": "mode 必须为 upload 或 camera"}), 400
+
+    detector_mode = request.form.get("detector", "auto").strip().lower()
+    if detector_mode not in ("auto", "onnx", "cv", "yolo"):
+        return jsonify({"error": "detector 必须为 auto/onnx/cv/yolo"}), 400
+
+    vlm_enabled = request.form.get("vlm", "0") == "1"
+    vlm_model = request.form.get("vlm_model", "qwen3-vl-flash").strip()
+    VLM_ALLOWED = {"qwen3-vl-flash", "qwen3-vl-plus", "qwen-vl-ocr", "qwen3-vl-max"}
+    if vlm_model not in VLM_ALLOWED:
+        vlm_model = "qwen3-vl-flash"
 
     if "image" not in request.files:
         return jsonify({"error": "缺少 image 文件"}), 400
@@ -166,14 +206,19 @@ def api_infer():
             if not session_id or len(session_id) > 64:
                 session_id = "anon-" + uuid.uuid4().hex[:8]
             use_api = request.form.get("api", "0") == "1"
-            res = _handle_dice_camera(img_bgr, session_id, use_api, dice_type)
+            with _DetectorModeCtx(detector_mode):
+                res = _handle_dice_camera(img_bgr, session_id, use_api, dice_type,
+                                          vlm=vlm_enabled, vlm_model=vlm_model)
             elapsed_ms = int((time.time() - t0) * 1000)
             return _camera_response(img_bgr, res, elapsed_ms)
         else:
             # —— 上传:完整检测 + 逐骰 OCR(可走百炼)——
             use_api = request.form.get("api", "0") == "1"
-            annotated, dice_info = dice_engine.analyze_image(
-                img_bgr, use_api=use_api, per_die_api=use_api, dice_type=dice_type)
+            with _DetectorModeCtx(detector_mode):
+                annotated, dice_info = dice_engine.analyze_image(
+                    img_bgr, use_api=use_api, per_die_api=use_api,
+                    dice_type=dice_type,
+                    vlm=vlm_enabled, vlm_model=vlm_model)
             summary = {
                 "image_size": [w, h],
                 "num_dice": len(dice_info),

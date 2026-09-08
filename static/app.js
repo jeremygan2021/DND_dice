@@ -109,6 +109,11 @@ btnRun.addEventListener('click', async () => {
   fd.append('dice_type', document.getElementById('diceType').value);
   fd.append('task', currentTask);
   fd.append('mode', 'upload');
+  fd.append('detector', document.getElementById('detectorSel').value);
+  if (vlmEnable && vlmEnable.checked) {
+    fd.append('vlm', '1');
+    fd.append('vlm_model', vlmModel.value);
+  }
   if (currentTask === 'dice' && upUseApi && upUseApi.checked) fd.append('api', '1');
   fd.append('image', currentFile);
 
@@ -211,8 +216,13 @@ const camStateEl = document.getElementById('camState');
 const btnCamStart = document.getElementById('btnCamStart');
 const btnCamStop = document.getElementById('btnCamStop');
 const camIntervalSel = document.getElementById('camInterval');
+const camDeviceSel = document.getElementById('camDevice');
 const camUseApi = document.getElementById('camUseApi');
 const upUseApi = document.getElementById('upUseApi');
+const detectorSel = document.getElementById('detectorSel');
+const detectorStatus = document.getElementById('detectorStatus');
+const vlmEnable = document.getElementById('vlmEnable');
+const vlmModel = document.getElementById('vlmModel');
 
 let camStream = null;
 let camTimer = null;          // setTimeout 句柄(自适应循环,非固定间隔)
@@ -224,29 +234,81 @@ let lastFrameWasStable = false;
 
 btnCamStart.addEventListener('click', startCamera);
 btnCamStop.addEventListener('click', stopCamera);
+camDeviceSel.addEventListener('change', async () => {
+  // 切换设备: 若在运行, 重建 stream
+  if (camRunning) {
+    stopCamera();
+    await startCamera();
+  }
+});
 
 function newSessionId() {
   return 'cam-' + Date.now().toString(36) + '-' +
          Math.random().toString(36).slice(2, 10);
 }
 
+// -------- 枚举摄像头设备 --------
+async function refreshDevices() {
+  if (!navigator.mediaDevices || !navigator.mediaDevices.enumerateDevices) {
+    camDeviceSel.innerHTML = '<option value="">浏览器不支持设备枚举</option>';
+    return;
+  }
+  try {
+    // enumerateDevices 需要先获取一次权限,否则 label 会空
+    if (!camStream) {
+      try {
+        const tmp = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+        tmp.getTracks().forEach(t => t.stop());
+      } catch (_) {}
+    }
+    const devices = await navigator.mediaDevices.enumerateDevices();
+    const videos = devices.filter(d => d.kind === 'videoinput');
+    const prev = camDeviceSel.value;
+    camDeviceSel.innerHTML = '';
+    if (videos.length === 0) {
+      camDeviceSel.innerHTML = '<option value="">未检测到摄像头</option>';
+      return;
+    }
+    videos.forEach((d, i) => {
+      const opt = document.createElement('option');
+      opt.value = d.deviceId;
+      opt.textContent = d.label || `摄像头 ${i + 1}`;
+      camDeviceSel.appendChild(opt);
+    });
+    if (prev && [...camDeviceSel.options].some(o => o.value === prev)) {
+      camDeviceSel.value = prev;
+    }
+  } catch (e) {
+    camDeviceSel.innerHTML = `<option value="">${e.message}</option>`;
+  }
+}
+refreshDevices();
+if (navigator.mediaDevices) {
+  navigator.mediaDevices.addEventListener('devicechange', refreshDevices);
+}
+
 async function startCamera() {
   camError.classList.add('hidden');
+  const isMobile = /Mobi|Android|iPhone/i.test(navigator.userAgent);
+  const videoConstraints = {
+    width: { ideal: Number(document.getElementById("camResolution").value) },
+    height: { ideal: Math.round(Number(document.getElementById("camResolution").value) * 9 / 16) },
+  };
+  const devId = camDeviceSel.value;
+  if (devId) {
+    videoConstraints.deviceId = { exact: devId };
+  } else {
+    videoConstraints.facingMode = 'environment';
+  }
   try {
-    const isMobile = /Mobi|Android|iPhone/i.test(navigator.userAgent);
-    camStream = await navigator.mediaDevices.getUserMedia({
-      video: {
-        width: { ideal: isMobile ? 640 : 1280 },
-        height: { ideal: isMobile ? 480 : 720 },
-        facingMode: 'environment',
-      },
-      audio: false,
-    });
+    camStream = await navigator.mediaDevices.getUserMedia({ video: videoConstraints, audio: false });
   } catch (e) {
     camError.textContent = `无法访问摄像头: ${e.message}（HTTPS 或 localhost 才能调用 getUserMedia）`;
     camError.classList.remove('hidden');
     return;
   }
+  // 设备列表里 label 可能刚被解锁,刷新一次
+  refreshDevices();
   camVideo.srcObject = camStream;
   await new Promise(r => camVideo.onloadedmetadata = r);
   camOverlay.width = camVideo.videoWidth;
@@ -273,17 +335,12 @@ async function startCamera() {
     const cost = performance.now() - started;
     let base = parseInt(camIntervalSel.value, 10) || 125;
     if (lastFrameWasStable) base = Math.max(base, 220);   // 稳定后不必高帧率
-    const next = Math.max(base, cost + 30);
+    const next = Math.max(0, base - cost);
     camTimer = setTimeout(loop, next);
   };
   loop();
-  // 切换帧率档位时,立即按新档位重启循环
-  camIntervalSel.onchange = () => {
-    if (camRunning) {
-      if (camTimer) clearTimeout(camTimer);
-      loop();
-    }
-  };
+  // 下一次调度直接读取新档位，不并发启动第二个推理循环。
+  camIntervalSel.onchange = null;
 }
 
 function stopCamera() {
@@ -315,13 +372,18 @@ async function captureAndInfer() {
   const ctx = off.getContext('2d', { willReadFrequently: true });
   ctx.drawImage(camVideo, 0, 0, vw, vh);
   // 质量 0.82:太高影响速度,太低影响 OCR
-  const blob = await new Promise(r => off.toBlob(r, 'image/jpeg', 0.82));
+  const blob = await new Promise(r => off.toBlob(r, 'image/jpeg', 0.92));
 
   const fd = new FormData();
   fd.append('dice_type', document.getElementById('diceType').value);
   fd.append('task', 'dice');
   fd.append('mode', 'camera');
   fd.append('session', camSessionId);
+  fd.append('detector', detectorSel.value);
+  if (vlmEnable && vlmEnable.checked) {
+    fd.append('vlm', '1');
+    fd.append('vlm_model', vlmModel.value);
+  }
   if (camUseApi.checked) fd.append('api', '1');  // 稳定后读值走百炼
   fd.append('image', blob, 'frame.jpg');
 
@@ -388,11 +450,20 @@ function drawOverlay(dice) {
     c.strokeRect(x1, y1, w, h);
     c.setLineDash([]);
 
-    // 标签:稳定且有值 → 绿色实心;正在后台 OCR → 灰"…";移动中不标数字
+    // 标签:稳定且有值 → 绿色实心;云端采纳 → 蓝色带值;VLM 跑完但越界 → 蓝色"raw?";VLM 进行中 → 蓝"☁";OCR 失败 → 待确认/?
     let label = null;
     let tagColor = null;
     if (st === 'stable') {
-      if (d.value != null) { label = String(d.value); tagColor = '#00d68f'; }
+      if (d.value != null) {
+        label = String(d.value);
+        tagColor = d.source === 'vlm' ? 'rgba(120,170,255,0.95)' : '#00d68f';
+      } else if (d.vlm_pending) {
+        label = '☁'; tagColor = 'rgba(120,170,255,0.95)';
+      } else if (d.vlm_text) {
+        // VLM 跑完了但越界被拒 → 把原始返回显示给用户看,提示"这是云端说的但不合规"
+        label = d.vlm_text.length <= 4 ? d.vlm_text : (d.vlm_text.slice(0,3) + '…');
+        tagColor = 'rgba(120,170,255,0.75)';
+      } else if (d.reason && !d.ocr_pending) { label = '待确认'; tagColor = 'rgba(255,180,80,0.9)'; }
       else if (d.ocr_gave_up) { label = '?'; tagColor = 'rgba(255,180,80,0.9)'; }
       else { label = '…'; tagColor = 'rgba(120,126,140,0.9)'; }
     }
@@ -414,8 +485,21 @@ async function refreshStatus() {
     const r = await fetch('/healthz');
     const d = await r.json();
     document.getElementById('devName').textContent = d.device;
-    document.getElementById('diceBackend').textContent = d.dice_detector.backend.toUpperCase() + (d.dice_detector.warning ? ' · ' + d.dice_detector.warning : ' · 七类模型');
+    const backend = (d.dice_detector.backend || '?').toUpperCase();
+    const warn = d.dice_detector.warning ? ' · ' + d.dice_detector.warning : '';
+    document.getElementById('diceBackend').textContent = backend + warn;
     document.getElementById('msDoc').textContent = d.models.doclayout ? '已就绪' : '未加载';
+    if (detectorStatus) {
+      const onnx = d.onnx_dice || {};
+      if (onnx.available) {
+        const dev = onnx.device ? `· ${onnx.device}` : '· 未加载';
+        detectorStatus.textContent = `onnx ✓ ${dev}`;
+        detectorStatus.className = 'detector-status on';
+      } else {
+        detectorStatus.textContent = 'onnx ✗ 模型未下载';
+        detectorStatus.className = 'detector-status off';
+      }
+    }
   } catch {}
 }
 refreshStatus();
